@@ -1,0 +1,17 @@
+const express = require('express');
+const router = express.Router();
+const ordersController = require('../controllers/ordersController');
+
+// GET all orders
+router.get('/', ordersController.getAllOrders);
+
+// POST a new order
+router.post('/', ordersController.createOrder);
+
+// PUT update order status
+router.put('/:id', ordersController.updateOrderStatus);
+
+// DELETE an order
+router.delete('/:id', ordersController.deleteOrder);
+
+module.exports = router;

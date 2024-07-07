@@ -1,0 +1,14 @@
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+}
+
+.order-form {
+  margin-bottom: 20px;
+}
+
+.order-form input, .order-form button {
+  margin: 5px;
+  padding: 10px;
+}
