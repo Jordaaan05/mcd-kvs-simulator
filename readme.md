@@ -1,6 +1,8 @@
 # This is a work in progress recreation of the McDonald's KVS (Kitchen Video System).
 
 To run the program, first run 'node .' in the kvs-backend directory, and then run 'npm start' in the kvs-frontend directory. 
+When running, first go to the admin page and press the three add all/import buttons to populate the database, this is also the current method of creating orders. This is soon to change.
+
 
 This is a very much work in progress project.
 
