@@ -5,7 +5,7 @@ import { menuItems } from './default_store/menuItems';
 import { kvsDisplays } from './default_store/kvsDisplays';
 
 function Admin() {
-  const [newOrder, setNewOrder] = useState({ id: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
+  const [newOrder, setNewOrder] = useState({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
   const [newItem, setNewItem] = useState({ amount: '', name: '', category: '', display: '' });
   const [newCategory, setNewCategory] = useState({ name: '' });
   const [options, setOptions] = useState([]);
@@ -79,7 +79,7 @@ function Admin() {
     try {
       await axios.post('http://localhost:5000/orders', orderToAdd)
       console.log('Order added successfully');
-      setNewOrder({ id: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
+      setNewOrder({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
       setNewItem({ amount: '', name: '', category: '', display: '' });
     } catch (error) {
       console.error('Error adding order:', error)
@@ -209,13 +209,13 @@ function Admin() {
       <div className="order-form">
         <input
           type="text"
-          placeholder="Order ID"
-          value={newOrder.id}
-          onChange={(e) => setNewOrder({ ...newOrder, id: e.target.value })}
+          placeholder="Order Number"
+          value={newOrder.orderNumber}
+          onChange={(e) => setNewOrder({ ...newOrder, orderNumber: e.target.value })}
         />
         <input
           type="text"
-          placeholder="Order Location"
+          placeholder="Order Location (DT/FC)"
           value={newOrder.location}
           onChange={(e) => setNewOrder({ ...newOrder, location: e.target.value })}
         />
@@ -237,7 +237,7 @@ function Admin() {
         <button onClick={addItemToOrder}>Add Item</button>
         <input
           type="text"
-          placeholder="MFY Side"
+          placeholder="MFY Side (1,2..4)"
           value={newOrder.mfySide}
           onChange={(e) => setNewOrder({ ...newOrder, mfySide: e.target.value })}
         />

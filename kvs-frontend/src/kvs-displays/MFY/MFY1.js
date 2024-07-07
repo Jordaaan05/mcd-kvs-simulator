@@ -143,7 +143,7 @@ function MFY1() {
                 <div className="order-header">
                   {renderHeader && (
                     <div className='order-header-contents'>
-                      <span className="order-id">{order.id}</span>
+                      <span className="order-id">{order.orderNumber}</span>
                       <span className="order-location">{order.location}</span>
                     </div>
                   )}
