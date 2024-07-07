@@ -151,7 +151,7 @@ function MFY1() {
                 <div className="order-items">
                   <ul>
                     {filteredItems.map((item, itemIndex) => (
-                      <li key={itemIndex}>{item.OrderItems.amount} {item.name}</li>
+                      <li key={itemIndex}>{item.OrderItems.amount} {item.display}</li>
                     ))}
                   </ul>
                 </div>

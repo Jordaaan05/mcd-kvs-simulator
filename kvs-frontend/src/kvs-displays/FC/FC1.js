@@ -143,7 +143,7 @@ function FC1() {
                 <div className="order-items">
                   <ul>
                     {order.Items.slice(i, i + itemsPerCard).map((item, itemIndex) => (
-                      <li key={itemIndex}>{item.OrderItems.amount} {item.name}</li>
+                      <li key={itemIndex}>{item.OrderItems.amount} {item.display}</li>
                     ))}
                   </ul>
                 </div>

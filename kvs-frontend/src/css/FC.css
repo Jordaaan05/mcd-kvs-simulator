@@ -15,7 +15,7 @@
 
 .kvs-background {
   height: 100vh;
-  background-color: gray;
+  background-color: rgb(30, 30, 30);
 }
 
 .orders-container {

@@ -173,7 +173,11 @@ function Admin() {
       const optionToFind = options.find(items => items.name === item.name)
       optionToFind.Categories.some(category => {
         if (category.name === "Breakfast" || category.name === "Beef" || category.name === "Chicken") {
-          kvsToSendTo.push("MFY1")
+          if (newOrder.mfySide === "1") {
+            kvsToSendTo.push("MFY1")
+          } else {
+            kvsToSendTo.push("MFY2")
+          }
         }
         return true
       })
