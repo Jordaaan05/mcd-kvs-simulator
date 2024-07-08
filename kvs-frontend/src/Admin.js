@@ -3,11 +3,12 @@ import axios from 'axios';
 import './css/Admin.css';
 import { menuItems } from './default_store/menuItems';
 import { kvsDisplays } from './default_store/kvsDisplays';
+import { defaultCategories } from './default_store/categories';
 
 function Admin() {
   const [newOrder, setNewOrder] = useState({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
   const [newItem, setNewItem] = useState({ amount: '', name: '', category: '', display: '' });
-  const [newCategory, setNewCategory] = useState({ name: '' });
+  const [newCategory, setNewCategory] = useState({ name: '', sortID: '' });
   const [options, setOptions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stations, setStations] = useState([]);
@@ -115,15 +116,17 @@ function Admin() {
     try {
       if (categoryName) {
         await axios.post('http://localhost:5000/categories', {
-          name: categoryName
+          name: categoryName.name,
+          sortID: categoryName.sortID
         });
       } else {
         await axios.post('http://localhost:5000/categories', {
-          name: newCategory.name
+          name: newCategory.name,
+          sortID: newCategory.sortID
         });
       }
         console.log('Category added successfully');
-        setNewCategory({ name: '' });
+        setNewCategory({ name: '', sortID: '' });
         fetchCategories()
     } catch (error) {
       console.error('Error adding category:', error)
@@ -131,14 +134,12 @@ function Admin() {
   }
 
   const generateCategory = async () => {
-    const desiredCategories = ["Breakfast", "Beef", "Chicken", "Sides", "Drinks", "McCafe", "Condiments", "Deserts"]
-
-    for (let categoryName of desiredCategories) {
-      if (categories.find(category => category.name === categoryName)) {
+    for (let defaultCategory of defaultCategories) {
+      if (categories.find(category => category.name === defaultCategory.name)) {
         console.log("Already Exists")
         continue;
       } else {
-        await handleAddCategory(categoryName)
+        await handleAddCategory(defaultCategory)
       }
     }
   }
@@ -175,8 +176,10 @@ function Admin() {
         if (category.name === "Breakfast" || category.name === "Beef" || category.name === "Chicken") {
           if (newOrder.mfySide === "1") {
             kvsToSendTo.push("MFY1")
+            return
           } else {
             kvsToSendTo.push("MFY2")
+            return
           }
         }
         return true
@@ -292,7 +295,14 @@ function Admin() {
           value={newCategory.name}
           onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value})}
         />
+        <input 
+          type='text'
+          placeholder='Category Sorting ID'
+          value={newCategory.sortID}
+          onChange={(e) => setNewCategory({ ...newCategory, sortID: e.target.value})}
+        />
         <button onClick={handleAddCategory}>Add Category</button>
+        <br></br>
         <button onClick={generateCategory}>Add all categories</button>
         <button onClick={assignItemsToCategories}>Assign Items to Categories</button>
         <button onClick={importStations}>Import stations from file</button>

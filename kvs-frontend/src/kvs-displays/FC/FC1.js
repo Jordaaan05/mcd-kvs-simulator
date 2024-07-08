@@ -130,6 +130,19 @@ function FC1() {
             const renderHeader = cardClass === 'order-card-single' || cardClass === 'order-card-left'
 
             const renderFooterText = cardClass === 'order-card-left' || cardClass === 'order-card-single'
+
+            const filteredItems = order.Items.slice(i, i + itemsPerCard).sort((a, b) => {
+                // Assuming each item has only one category for simplicity. If an item can have multiple categories, adjust accordingly.
+                const categoryA = a.Categories[0];
+                const categoryB = b.Categories[0];
+            
+                if (categoryA.sortID !== categoryB.sortID) {
+                    return categoryA.sortID - categoryB.sortID;
+                } else {
+                    return a.ID - b.ID;
+                }
+            });
+
             cards.push(
               <div className={`order-card ${cardClass} ${getOrderBorderStyle(orderIndex)}`} key={`${order.id}-${i}`}>
                 <div className="order-header">
@@ -142,7 +155,7 @@ function FC1() {
                 </div>
                 <div className="order-items">
                   <ul>
-                    {order.Items.slice(i, i + itemsPerCard).map((item, itemIndex) => (
+                    {filteredItems.map((item, itemIndex) => (
                       <li key={itemIndex}>{item.OrderItems.amount} {item.display}</li>
                     ))}
                   </ul>

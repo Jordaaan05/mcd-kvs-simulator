@@ -137,7 +137,24 @@ function MFY1() {
                     category.name === 'Beef' ||
                     category.name === 'Chicken'
                 )
-            );
+            ).sort((a, b) => {
+                const categoryA = a.Categories.find(category => 
+                    category.name === 'Breakfast' || 
+                    category.name === 'Beef' ||
+                    category.name === 'Chicken'
+                );
+                const categoryB = b.Categories.find(category => 
+                    category.name === 'Breakfast' || 
+                    category.name === 'Beef' ||
+                    category.name === 'Chicken'
+                );
+                
+                if (categoryA.sortID !== categoryB.sortID) {
+                    return categoryA.sortID - categoryB.sortID;
+                } else {
+                    return a.ID - b.ID;
+                }
+            });
             cards.push(
               <div className={`order-card ${cardClass} ${getOrderBorderStyle(orderIndex)}`} key={`${order.id}-${i}`}>
                 <div className="order-header">

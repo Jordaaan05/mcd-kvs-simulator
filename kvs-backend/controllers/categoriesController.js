@@ -11,11 +11,12 @@ const getAllCategories = async (req, res) => {
 }
 
 const createCategory = async (req, res) => {
-    const { name } = req.body;
+    const { name, sortID } = req.body;
 
     try {
         const newCategory = await Category.create({
-            name
+            name,
+            sortID
         });
 
         res.status(201).json(newCategory);
