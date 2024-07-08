@@ -1,6 +1,6 @@
 export const kvsDisplays = [
     {name: 'MFY1', group: 'MFY', displayName: 'MFY Side 1'},
-    {name: 'MFY2', group: 'MFY', displayName: 'MFY Side 3'},
+    {name: 'MFY2', group: 'MFY', displayName: 'MFY Side 2'},
     {name: 'MFY3', group: 'MFY', displayName: 'MFY Side 3'},
     {name: 'MFY4', group: 'MFY', displayName: 'MFY Side 4'},
     {name: 'FC1', group: 'FC', displayName: 'FC Side 1'},

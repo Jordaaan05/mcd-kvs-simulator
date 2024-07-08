@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../css/FC.css';
+import '../../css/MFY.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
-import { averageTimestampDifferenceLastHour, averageTimestampDifferenceLast24Hours } from '../modules/calculateAverageTimes';
+import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
 import fetchStation from '../modules/fetch/fetchStations';
 
-function FC1() {
+function MFY2() {
   const [orders, setOrders] = useState([]);
-  const columns = 4; // Set the number of columns here
+  const columns = 2; // Set the number of columns here
   const [activeIndex, setActiveIndex] = useState(0);
   const itemsPerCard = 12; // Max number of items per card
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
-  const stationName = "FC1"
+  const stationName = "MFY2"
 
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function FC1() {
   const fetchOrders = async () => {
     try {
       const response = await axios.get('http://localhost:5000/orders');
-      const filteredOrders = response.data.filter(order => !order.served?.FC1); // Skip orders with servedTime
+      const filteredOrders = response.data.filter(order => !order.served?.MFY2).filter(order => order.sendToKVS.includes(stationName)); // Skip orders with servedTime
       setOrders(filteredOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -43,8 +43,8 @@ function FC1() {
       const response = await axios.get('http://localhost:5000/orders');
 
       const recentServedOrders = response.data.filter(order => {
-        if (order.served?.FC1) {
-          const servedTimestamp = new Date(order.served.FC1).getTime();
+        if (order.served?.MFY2) {
+          const servedTimestamp = new Date(order.served.MFY2).getTime();
           const now = new Date().getTime();
           const hoursDifference = (now - servedTimestamp) / (1000 * 60 * 60); // Convert difference to hours
           return hoursDifference <= 24; // Include orders served within the last 24 hours
@@ -68,7 +68,7 @@ function FC1() {
       ...orderToUpdate,
       served: {
         ...orderToUpdate.served,
-        FC1: servedTimestamp,
+        MFY2: servedTimestamp,
       },
     };
     await axios.put(`http://localhost:5000/orders/${id}`, updatedOrder);
@@ -112,7 +112,7 @@ function FC1() {
       return 'active-card';
     };
   };
- 
+  
   return (
     <div className="App kvs-background">
       <div className={`orders-container columns-${columns}`}>
@@ -131,18 +131,30 @@ function FC1() {
 
             const renderFooterText = cardClass === 'order-card-left' || cardClass === 'order-card-single'
 
-            const filteredItems = order.Items.slice(i, i + itemsPerCard).sort((a, b) => {
-                // Assuming each item has only one category for simplicity. If an item can have multiple categories, adjust accordingly.
-                const categoryA = a.Categories[0];
-                const categoryB = b.Categories[0];
-            
+            const filteredItems = order.Items.slice(i, i + itemsPerCard).filter(item => 
+                item.Categories.some(category => 
+                    category.name === 'Breakfast' || 
+                    category.name === 'Beef' ||
+                    category.name === 'Chicken'
+                )
+            ).sort((a, b) => {
+                const categoryA = a.Categories.find(category => 
+                    category.name === 'Breakfast' || 
+                    category.name === 'Beef' ||
+                    category.name === 'Chicken'
+                );
+                const categoryB = b.Categories.find(category => 
+                    category.name === 'Breakfast' || 
+                    category.name === 'Beef' ||
+                    category.name === 'Chicken'
+                );
+                
                 if (categoryA.sortID !== categoryB.sortID) {
                     return categoryA.sortID - categoryB.sortID;
                 } else {
                     return a.ID - b.ID;
                 }
             });
-
             cards.push(
               <div className={`order-card ${cardClass} ${getOrderBorderStyle(orderIndex)}`} key={`${order.id}-${i}`}>
                 <div className="order-header">
@@ -164,7 +176,6 @@ function FC1() {
                   {renderFooterText && (
                     <div className='order-footer-text'>
                       <span className='order-status'>{order.status}</span>
-                      <span className='order-mfySide'>Side {order.mfySide}</span>
                       <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
                     </div>
                   )}
@@ -191,4 +202,4 @@ function FC1() {
   );
 }
 
-export default FC1;
+export default MFY2;

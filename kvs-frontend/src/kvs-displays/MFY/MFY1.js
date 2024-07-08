@@ -176,7 +176,6 @@ function MFY1() {
                   {renderFooterText && (
                     <div className='order-footer-text'>
                       <span className='order-status'>{order.status}</span>
-                      <span className='order-mfySide'>Side {order.mfySide}</span>
                       <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
                     </div>
                   )}
@@ -189,7 +188,7 @@ function MFY1() {
         })}
 
         <div className='station-statistics'>
-          <span className='station-stats'>All / MFY Side 1 <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName)}</span>
+          <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName)}</span>
         </div>
 
         <div className="order-actions">
