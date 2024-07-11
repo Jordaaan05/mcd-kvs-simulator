@@ -6,6 +6,7 @@ const ordersRouter = require('./routes/orders'); // Adjust the path as per your 
 const optionsRouter = require('./routes/options')
 const categoriesRouter = require('./routes/categories')
 const stationsRouter = require('./routes/stations')
+const storeRouter = require('./routes/store')
 
 const app = express();
 app.use(cors());
@@ -16,6 +17,7 @@ app.use('/orders', ordersRouter);
 app.use('/options', optionsRouter);
 app.use('/categories', categoriesRouter)
 app.use('/stations', stationsRouter)
+app.use('/store', storeRouter)
 
 const PORT = process.env.PORT || 5000;
 

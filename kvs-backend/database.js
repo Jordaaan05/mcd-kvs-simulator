@@ -128,6 +128,17 @@ const Stations = sequelize.define('Stations', {
 }
 )
 
+const Store = sequelize.define('Store', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  currentBusinessDay: {
+    type: DataTypes.STRING
+  }
+})
+
 // Define relationships (if any)
 Order.belongsToMany(Item, { through: OrderItems });
 Item.belongsToMany(Order, { through: OrderItems });
@@ -150,5 +161,6 @@ module.exports = {
   Category,
   OrderItems,
   ItemCategory,
-  Stations
+  Stations,
+  Store
 };

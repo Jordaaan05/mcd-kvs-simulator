@@ -4,6 +4,7 @@ import '../../css/FC.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLastHour, averageTimestampDifferenceLast24Hours } from '../modules/calculateAverageTimes';
 import fetchStation from '../modules/fetch/fetchStations';
+import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
 
 function FC1() {
   const [orders, setOrders] = useState([]);
@@ -12,6 +13,7 @@ function FC1() {
   const itemsPerCard = 12; // Max number of items per card
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
+  const [currentBusinessDay, setCurrentBusinessDay] = useState();
   const stationName = "FC1"
 
 
@@ -20,6 +22,8 @@ function FC1() {
       fetchOrders();
       const stationData = await fetchStation(stationName);
       setCurrentStation(stationData);
+      const businessDayData = await fetchCurrentBusinessDay();
+      setCurrentBusinessDay(businessDayData)
       fetchRecentServedOrders();
     };
 
@@ -177,7 +181,7 @@ function FC1() {
         })}
 
         <div className='station-statistics'>
-          <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName)}</span>
+          <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}</span>
         </div>
 
         <div className="order-actions">

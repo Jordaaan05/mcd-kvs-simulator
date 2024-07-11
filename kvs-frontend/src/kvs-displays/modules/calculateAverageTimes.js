@@ -1,8 +1,15 @@
-const averageTimestampDifferenceLastHour = (orders, stationName) => {
+const averageTimestampDifferenceLastHour = (orders, stationName, currentBusinessDay) => {
     const now = new Date();
+
     const oneHourAgo = now.getTime() - (60 * 60 * 1000); // Timestamp for one hour ago
 
-    const filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(oneHourAgo));
+    let filteredOrders = null
+    if (new Date(oneHourAgo) < new Date(currentBusinessDay)) {
+        // for when the day was opened within the last hour
+        filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(currentBusinessDay));
+    } else {
+        filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(oneHourAgo));
+    }
 
     if (filteredOrders.length === 0) {
         return 0; // Return 0 if no served orders in the last hour
@@ -15,11 +22,17 @@ const averageTimestampDifferenceLastHour = (orders, stationName) => {
     return Math.floor(sumDifference / filteredOrders.length); // Average difference in seconds
 };
 
-const averageTimestampDifferenceLast24Hours = (orders, stationName) => {
+const averageTimestampDifferenceLast24Hours = (orders, stationName, currentBusinessDay) => {
     const now = new Date();
     const twentyFourHoursAgo = now.getTime() - (24 * 60 * 60 * 1000); // Timestamp for 24 hours ago
 
-    const filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(twentyFourHoursAgo));
+    let filteredOrders = null
+    if (new Date(twentyFourHoursAgo) < new Date(currentBusinessDay)) {
+        // for when the day was opened within the last day
+        filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(currentBusinessDay));
+    } else {
+        filteredOrders = orders.filter(order => order.served[stationName] && new Date(order.served[stationName]) > new Date(twentyFourHoursAgo));
+    }
 
     if (filteredOrders.length === 0) {
         return 0; // Return 0 if no served orders in the last 24 hours

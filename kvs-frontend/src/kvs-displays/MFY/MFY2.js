@@ -4,6 +4,7 @@ import '../../css/MFY.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
 import fetchStation from '../modules/fetch/fetchStations';
+import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
 
 function MFY2() {
   const [orders, setOrders] = useState([]);
@@ -12,6 +13,7 @@ function MFY2() {
   const itemsPerCard = 12; // Max number of items per card
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
+  const [currentBusinessDay, setCurrentBusinessDay] = useState();
   const stationName = "MFY2"
 
 
@@ -20,6 +22,8 @@ function MFY2() {
       fetchOrders();
       const stationData = await fetchStation(stationName);
       setCurrentStation(stationData);
+      const businessDayData = await fetchCurrentBusinessDay();
+      setCurrentBusinessDay(businessDayData)
       fetchRecentServedOrders();
     };
 
@@ -188,7 +192,7 @@ function MFY2() {
         })}
 
         <div className='station-statistics'>
-          <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName)}</span>
+          <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}</span>
         </div>
 
         <div className="order-actions">

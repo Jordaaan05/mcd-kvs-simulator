@@ -12,6 +12,7 @@ function Admin() {
   const [options, setOptions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stations, setStations] = useState([]);
+  const [currentBusinessDay, setCurrentBusinessDay] = useState();
 
   const fetchOptions = async () => {
     try {
@@ -40,10 +41,30 @@ function Admin() {
     }
   }
 
+  const fetchCurrentBusinessDay = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/store/latest');
+      if (response.data.currentBusinessDay) {
+        setCurrentBusinessDay(response.data.currentBusinessDay);
+      } else {
+        const now = new Date();
+        now.setHours(3, 0, 0, 0);
+        await axios.post('http://localhost:5000/store', {
+          businessDate: now
+        })
+        const response = await axios.get('http://localhost:5000/store/latest');
+        setCurrentBusinessDay(response.data.currentBusinessDay);
+      }
+    } catch (error) {
+      console.error('Error fetching store information:', error)
+    }
+  }
+
   useEffect(() => {
     // Fetch options from your backend on component mount
     fetchOptions();
     fetchCategories();
+    fetchCurrentBusinessDay();
   }, []);
 
   const addItemToOrder = () => {
@@ -176,10 +197,10 @@ function Admin() {
         if (category.name === "Breakfast" || category.name === "Beef" || category.name === "Chicken") {
           if (newOrder.mfySide === "1") {
             kvsToSendTo.push("MFY1")
-            return
+            return true
           } else {
             kvsToSendTo.push("MFY2")
-            return
+            return true
           }
         }
         return true
@@ -208,6 +229,23 @@ function Admin() {
       }
     }
     fetchStations();
+  }
+
+  const openNewBusinessDay = async () => {
+    const newBusinessDay = new Date();
+
+    console.log(newBusinessDay.getDate())
+
+    const currentDay = new Date(currentBusinessDay)
+
+    if (newBusinessDay.getDate() === currentDay.getDate()) {
+      console.log("Business date is already current... Aborting opening new day")
+      return
+    }
+
+    await axios.post('http://localhost:5000/store', {
+      businessDate: newBusinessDay
+    })
   }
 
   return (
@@ -306,6 +344,8 @@ function Admin() {
         <button onClick={generateCategory}>Add all categories</button>
         <button onClick={assignItemsToCategories}>Assign Items to Categories</button>
         <button onClick={importStations}>Import stations from file</button>
+        <br></br>
+        <button onClick={openNewBusinessDay}>Open next business day</button>
       </div>
     </div>
   );
