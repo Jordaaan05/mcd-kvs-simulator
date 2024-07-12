@@ -12,3 +12,19 @@
   margin: 5px;
   padding: 10px;
 }
+
+.button {
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button-red {
+  background-color: red;
+}
+
+.button-green {
+  background-color: green;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../css/MFY.css';
+import '../../css/BasicKVS.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
 import fetchStation from '../modules/fetch/fetchStations';
@@ -196,10 +196,10 @@ function MFY2() {
         </div>
 
         <div className="order-actions">
-          <button onClick={() => serveOrder(orders[activeIndex])}>Serve</button>
-          <button onClick={selectPreviousOrder}>Prev</button>
-          <button onClick={selectNextOrder}>Next</button>
-          <button onClick={handleStationToggle}>Side ON/OFF</button>
+          <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>
+          <button onClick={selectPreviousOrder} className='prev-next-button'>Prev</button>
+          <button onClick={selectNextOrder} className='prev-next-button'>Next</button>
+          <button onClick={handleStationToggle} className='on-off-button'>Side ON/OFF</button>
         </div>
       </div>
     </div>

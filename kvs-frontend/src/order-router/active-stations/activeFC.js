@@ -1,0 +1,1 @@
+// returns FC sides that are ON

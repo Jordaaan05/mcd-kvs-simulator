@@ -12,7 +12,8 @@ function Admin() {
   const [options, setOptions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stations, setStations] = useState([]);
-  const [currentBusinessDay, setCurrentBusinessDay] = useState();
+  const [currentBusinessDay, setCurrentBusinessDay] = useState(0);
+  const [dayStatus, setDayStatus] = useState("GREEN")
 
   const fetchOptions = async () => {
     try {
@@ -44,16 +45,22 @@ function Admin() {
   const fetchCurrentBusinessDay = async () => {
     try {
       const response = await axios.get('http://localhost:5000/store/latest');
-      if (response.data.currentBusinessDay) {
-        setCurrentBusinessDay(response.data.currentBusinessDay);
+      if (!response.data) {
+        const pastDate = 1718090268969 // 31 days prior to 12/07/24 @ 7:18pm, just an abitrary past date.
+        setCurrentBusinessDay(pastDate)
+        console.log("Using an old/undetermined business date. Please open the day promptly.")
+        setDayStatus("RED")
       } else {
+        const currentBusinessDate = response.data.currentBusinessDay
+        setCurrentBusinessDay(currentBusinessDate);
         const now = new Date();
-        now.setHours(3, 0, 0, 0);
-        await axios.post('http://localhost:5000/store', {
-          businessDate: now
-        })
-        const response = await axios.get('http://localhost:5000/store/latest');
-        setCurrentBusinessDay(response.data.currentBusinessDay);
+        const twentyFourHoursAgo = now.getTime() - (24 * 60 * 60 * 1000);
+        
+        if (new Date(currentBusinessDate) > new Date(twentyFourHoursAgo)) {
+          setDayStatus("GREEN")
+        } else {
+          setDayStatus("RED")
+        }
       }
     } catch (error) {
       console.error('Error fetching store information:', error)
@@ -234,8 +241,7 @@ function Admin() {
   const openNewBusinessDay = async () => {
     const newBusinessDay = new Date();
 
-    console.log(newBusinessDay.getDate())
-
+    fetchCurrentBusinessDay();
     const currentDay = new Date(currentBusinessDay)
 
     if (newBusinessDay.getDate() === currentDay.getDate()) {
@@ -246,6 +252,9 @@ function Admin() {
     await axios.post('http://localhost:5000/store', {
       businessDate: newBusinessDay
     })
+
+    console.log(`New day: ${newBusinessDay.getDate()}-${newBusinessDay.getMonth()}-${newBusinessDay.getFullYear()} opened successfully.`)
+    setDayStatus("GREEN") // day status okay as day opened successfully
   }
 
   return (
@@ -345,7 +354,9 @@ function Admin() {
         <button onClick={assignItemsToCategories}>Assign Items to Categories</button>
         <button onClick={importStations}>Import stations from file</button>
         <br></br>
-        <button onClick={openNewBusinessDay}>Open next business day</button>
+        <button onClick={openNewBusinessDay} className={`button ${dayStatus === "RED" ? "button-red" : "button-green"}`}>Open next business day</button>
+        <br></br>
+        <span>If red, immediate action is required. Activate day open process. Green means all good until tomorrow!</span>
       </div>
     </div>
   );
