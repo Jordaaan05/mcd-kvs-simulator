@@ -152,8 +152,9 @@ function FC1() {
                 <div className="order-header">
                   {renderHeader && (
                     <div className='order-header-contents'>
-                      <span className="order-id">{order.orderNumber}</span>
+                      <span className="eat-in-take-out"></span>
                       <span className="order-location">{order.location}</span>
+                      <span className="order-id">{order.registerNumber}-{order.orderNumber || "00"}</span>
                     </div>
                   )}
                 </div>

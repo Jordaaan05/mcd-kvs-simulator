@@ -20,7 +20,7 @@ const getAllOrders = async (req, res) => {
 
 // Create a new order
 const createOrder = async (req, res) => {
-  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo } = req.body;
+  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber } = req.body;
 
   try {
     const newOrder = await Order.create({
@@ -30,7 +30,8 @@ const createOrder = async (req, res) => {
       mfySide,
       timestamp,
       FCSide,
-      sendToKVS: kvsToSendTo
+      sendToKVS: kvsToSendTo,
+      registerNumber: registerNumber
     });
 
     const itemPromises = items.map(async (item) => {

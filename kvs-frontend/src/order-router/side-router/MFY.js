@@ -8,11 +8,11 @@ const roundRobinAssign = (activeMfySides) => {
     return activeMfySides[lastIndex].name;
 }
 
-const mfyRouter = (stations) => {
+const mfyRouter = async (stations) => {
     const mfySides = stations.filter(station => station.group === "MFY")
 
     const activeMfySides = getActiveMFYSides(mfySides) // returns mfySides marked as ON
-    const numActiveMfySides = length(activeMfySides)
+    const numActiveMfySides = activeMfySides.length
 
     if (numActiveMfySides === 1) {
         return activeMfySides[0].name;
@@ -21,11 +21,11 @@ const mfyRouter = (stations) => {
         const sideA = activeMfySides[0].name;
         const sideB = activeMfySides[1].name;
 
-        const sideAOrders = fetchOrders(sideA)
-        const sideBOrders = fetchOrders(sideB)
+        const sideAOrders = await fetchOrders(sideA)
+        const sideBOrders = await fetchOrders(sideB)
 
-        const numSideAOrders = length(sideAOrders);
-        const numSideBOrders = length(sideBOrders);
+        const numSideAOrders = sideAOrders.length
+        const numSideBOrders = sideBOrders.length
 
         if (numSideAOrders === numSideBOrders) {
             return sideA;

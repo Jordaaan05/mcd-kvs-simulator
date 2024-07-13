@@ -4,6 +4,7 @@ import './css/Admin.css';
 import { menuItems } from './default_store/menuItems';
 import { kvsDisplays } from './default_store/kvsDisplays';
 import { defaultCategories } from './default_store/categories';
+import routeOrder from './order-router/orderRouter';
 
 function Admin() {
   const [newOrder, setNewOrder] = useState({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
@@ -53,10 +54,8 @@ function Admin() {
       } else {
         const currentBusinessDate = response.data.currentBusinessDay
         setCurrentBusinessDay(currentBusinessDate);
-        const now = new Date();
-        const twentyFourHoursAgo = now.getTime() - (24 * 60 * 60 * 1000);
         
-        if (new Date(currentBusinessDate) > new Date(twentyFourHoursAgo)) {
+        if (new Date(currentBusinessDate).getDate() === new Date().getDate()) {
           setDayStatus("GREEN")
         } else {
           setDayStatus("RED")
@@ -89,22 +88,24 @@ function Admin() {
   };
 
   const handleAddOrder = async () => {
-    const locationToAdd = newOrder.location === '' || newOrder.location === undefined ? 'DT' : newOrder.location;
+    const locationToAdd = newOrder.location === '' || newOrder.location === undefined ? '' : newOrder.location;
     const defaultMFY = newOrder.mfySide === '' || newOrder.mfySide === undefined ? '1' : newOrder.mfySide;
     const defaultFC = newOrder.FCSide === '' || newOrder.FCSide === undefined ? '1' : newOrder.FCSide
     const timestamp = new Date()
+    const registerNumber = "R5"
     
-    const kvsToSendTo = await relevantKVS()
-
     const orderToAdd = {
       ...newOrder,
       location: locationToAdd,
       mfySide: defaultMFY,
       timestamp: timestamp,
       FCSide: defaultFC,
-      kvsToSendTo: kvsToSendTo
+      registerNumber: registerNumber
     };
     
+    routeOrder(orderToAdd)
+    setNewOrder({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
+    /*
     try {
       await axios.post('http://localhost:5000/orders', orderToAdd)
       console.log('Order added successfully');
@@ -113,6 +114,7 @@ function Admin() {
     } catch (error) {
       console.error('Error adding order:', error)
     }
+      */
   };
 
   const handleAddItem = async (menuItem) => {
@@ -190,31 +192,6 @@ function Admin() {
     }
     fetchOptions();
     fetchCategories();
-  }
-
-  const relevantKVS = () => {
-    // An extremely basic order router
-    fetchOptions();
-
-    let kvsToSendTo = [];
-
-    for (let item of newOrder.items) {
-      const optionToFind = options.find(items => items.name === item.name)
-      optionToFind.Categories.some(category => {
-        if (category.name === "Breakfast" || category.name === "Beef" || category.name === "Chicken") {
-          if (newOrder.mfySide === "1") {
-            kvsToSendTo.push("MFY1")
-            return true
-          } else {
-            kvsToSendTo.push("MFY2")
-            return true
-          }
-        }
-        return true
-      })
-    }
-
-    return kvsToSendTo
   }
 
   const importStations = async () => {

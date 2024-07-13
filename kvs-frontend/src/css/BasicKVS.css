@@ -125,12 +125,12 @@
 }
 
 .order-header-contents .order-id {
-  text-align: left;
+  text-align: right;
   font-weight: bold;
 }
 
 .order-header-contents .order-location {
-  text-align: right;
+  text-align: center;
   font-weight: bold;
 }
 

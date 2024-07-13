@@ -10,5 +10,6 @@ export const kvsDisplays = [
     {name: 'CAFE2', group: 'CAFE', displayName: 'McCafe Side 2'},
     {name: 'FRY1', group: 'FRY', displayName: 'Fries'},
     {name: 'DT1', group: 'DT', displayName: 'DT RPP'},
+    {name: 'DT2', group: 'DT', displayName: 'DT RPP'}, // park display
     {name: 'DRINKS1', group: 'DRINKS', displayName: 'Drinks'},
 ]
