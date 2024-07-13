@@ -4,8 +4,8 @@ import MFY2 from './kvs-displays/MFY/MFY2';
 import MFY3 from './kvs-displays/MFY/MFY3';
 import MFY4 from './kvs-displays/MFY/MFY4';
 import FC1 from './kvs-displays/FC/FC1';
-/*import FC2 from './FC2';
-import DT from './DT';
+import FC2 from './kvs-displays/FC/FC2';
+/*import DT from './DT';
 import DTPark from './DTPark';
 import Cafe1 from './Cafe1';
 import Cafe2 from './Cafe2'; */
@@ -27,6 +27,8 @@ const App = () => {
           return <MFY4 />;
         case 'fc1':
           return <FC1 />;
+        case 'fc2':
+          return <FC2 />;
         case 'admin':
           return <AdminPage />;
         default:
@@ -62,8 +64,7 @@ export default App;
         
         
         
-        case 'fc2':
-          return <FC2 />;
+       
         case 'dt':
           return <DT />;
         case 'dtpark':

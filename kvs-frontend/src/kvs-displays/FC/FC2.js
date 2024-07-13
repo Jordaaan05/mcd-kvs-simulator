@@ -6,7 +6,7 @@ import { averageTimestampDifferenceLastHour, averageTimestampDifferenceLast24Hou
 import fetchStation from '../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
 
-function FC1() {
+function FC2() {
   const [orders, setOrders] = useState([]);
   const columns = 4; // Set the number of columns here
   const [activeIndex, setActiveIndex] = useState(0);
@@ -14,7 +14,7 @@ function FC1() {
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
-  const stationName = "FC1"
+  const stationName = "FC2"
 
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function FC1() {
   const fetchOrders = async () => {
     try {
       const response = await axios.get('http://localhost:5000/orders');
-      const filteredOrders = response.data.filter(order => !order.served?.FC1).filter(order => order.sendToKVS.includes("FC1")); // Skip orders with servedTime
+      const filteredOrders = response.data.filter(order => !order.served?.FC2).filter(order => order.sendToKVS.includes("FC2")); // Skip orders with servedTime
       setOrders(filteredOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -47,8 +47,8 @@ function FC1() {
       const response = await axios.get('http://localhost:5000/orders');
 
       const recentServedOrders = response.data.filter(order => {
-        if (order.served?.FC1) {
-          const servedTimestamp = new Date(order.served.FC1).getTime();
+        if (order.served?.FC2) {
+          const servedTimestamp = new Date(order.served.FC2).getTime();
           const now = new Date().getTime();
           const hoursDifference = (now - servedTimestamp) / (1000 * 60 * 60); // Convert difference to hours
           return hoursDifference <= 24; // Include orders served within the last 24 hours
@@ -72,7 +72,7 @@ function FC1() {
       ...orderToUpdate,
       served: {
         ...orderToUpdate.served,
-        FC1: servedTimestamp,
+        FC2: servedTimestamp,
       },
     };
     await axios.put(`http://localhost:5000/orders/${id}`, updatedOrder);
@@ -196,4 +196,4 @@ function FC1() {
   );
 }
 
-export default FC1;
+export default FC2;

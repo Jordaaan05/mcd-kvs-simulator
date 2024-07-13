@@ -25,7 +25,7 @@ const routeOrder = async (newOrder) => {
 
     if ((registerValue >= 1 && registerValue <= 29) || registerValue >= 40) {
         // Front Counter order, as the input register is between R1 and R29, or more than/equal to R40.
-        const fcSideName = fcRouter(stations)
+        const fcSideName = await fcRouter(stations)
         relevantKVS.push(fcSideName)
     } else if (registerValue >= 30 && registerValue <= 39) {
         // Drive Thru order, as the input register is between R30 and R39. 
