@@ -1,7 +1,7 @@
 import getActiveFCSides from "../active-stations/activeFC";
 import fetchOrders from "../fetch-modules/fetchOrders";
 
-const fcRouter = (stations) => {
+const fcRouter = async (stations) => {
     const fcSides = stations.filter(station => station.group === "FC")
 
     const activeFcSides = getActiveFCSides(fcSides)
@@ -14,8 +14,8 @@ const fcRouter = (stations) => {
         const sideA = activeFcSides[0].name;
         const sideB = activeFcSides[1].name;
 
-        const sideAOrders = fetchOrders(sideA)
-        const sideBOrders = fetchOrders(sideB)
+        const sideAOrders = await fetchOrders(sideA)
+        const sideBOrders = await fetchOrders(sideB)
 
         const numSideAOrders = sideAOrders.length
         const numSideBOrders = sideBOrders.length

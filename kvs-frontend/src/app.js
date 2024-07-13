@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import MFY1 from './kvs-displays/MFY/MFY1';
 import MFY2 from './kvs-displays/MFY/MFY2';
-/*import MFY3 from './MFY3';
-import MFY4 from './MFY4';*/
+import MFY3 from './kvs-displays/MFY/MFY3';
+import MFY4 from './kvs-displays/MFY/MFY4';
 import FC1 from './kvs-displays/FC/FC1';
 /*import FC2 from './FC2';
 import DT from './DT';
@@ -21,6 +21,10 @@ const App = () => {
           return <MFY1 />;
         case 'mfy2':
           return <MFY2 />;
+        case 'mfy3':
+          return <MFY3 />;
+        case 'mfy4':
+          return <MFY4 />;
         case 'fc1':
           return <FC1 />;
         case 'admin':
@@ -57,10 +61,7 @@ export default App;
 /* Rest of the cases: 
         
         
-        case 'mfy3':
-          return <MFY3 />;
-        case 'mfy4':
-          return <MFY4 />;
+        
         case 'fc2':
           return <FC2 />;
         case 'dt':
