@@ -211,6 +211,8 @@
   color: white;
   font-weight: 600;
   font-size: larger;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .station-status.ON {

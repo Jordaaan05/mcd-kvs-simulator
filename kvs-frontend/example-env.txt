@@ -1,0 +1,5 @@
+The ENV file should resemble the following: 
+
+SERVER_ADDRESS: http://{local/public address of server}
+
+Only use a public address in that field if you intend for the program to be accessible from outside of your local network.

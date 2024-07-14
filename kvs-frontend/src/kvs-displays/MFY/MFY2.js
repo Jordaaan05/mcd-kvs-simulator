@@ -34,7 +34,7 @@ function MFY2() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/orders');
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.MFY2).filter(order => order.sendToKVS.includes(stationName)); // Skip orders with servedTime
       setOrders(filteredOrders);
     } catch (error) {
@@ -44,7 +44,7 @@ function MFY2() {
 
   const fetchRecentServedOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/orders');
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders`);
 
       const recentServedOrders = response.data.filter(order => {
         if (order.served?.MFY2) {
@@ -75,7 +75,7 @@ function MFY2() {
         MFY2: servedTimestamp,
       },
     };
-    await axios.put(`http://localhost:5000/orders/${id}`, updatedOrder);
+    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders/${id}`, updatedOrder);
 
     fetchOrders();
     fetchRecentServedOrders();
