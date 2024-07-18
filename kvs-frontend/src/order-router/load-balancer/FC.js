@@ -1,5 +1,5 @@
 import getActiveFCSides from "../active-stations/activeFC";
-import fetchOrders from "../fetch-modules/fetchOrders";
+import { fetchOrders } from "../fetch-modules/fetchOrders";
 
 const fcRouter = async (stations) => {
     const fcSides = stations.filter(station => station.group === "FC")

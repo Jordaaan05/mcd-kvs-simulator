@@ -5,7 +5,7 @@ let stations = []
 
 const fetchStations = async () => {
     try {
-        const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/stations`)
+        const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`)
         stations = response.data;
     } catch (error) {
         console.error('Error fetching stations:', error)
@@ -31,12 +31,12 @@ const toggleStationStatus = async (currentStation) => {
     }
     if (currentStation.status === "ON") {
         console.log(`Turning off ${currentStation.displayName}`)
-        await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/stations/${currentStation.id}`, {
+        await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
             status: "OFF"
         })
     } else {
         console.log(`Turning on ${currentStation.displayName}`)
-        await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/stations/${currentStation.id}`, {
+        await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
             status: "ON"
         })
     }

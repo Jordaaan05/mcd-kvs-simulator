@@ -134,6 +134,10 @@
   font-weight: bold;
 }
 
+.order-header-contents .eat-in-take-out {
+  font-weight: bold;
+}
+
 .order-items {
   padding: 0;
   margin-top: 0;

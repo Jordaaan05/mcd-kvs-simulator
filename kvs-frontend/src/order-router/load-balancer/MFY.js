@@ -1,5 +1,5 @@
 import getActiveMFYSides from "../active-stations/activeMFY"
-import fetchOrders from "../fetch-modules/fetchOrders"
+import { fetchOrders } from "../fetch-modules/fetchOrders"
 
 let lastIndex = -1
 

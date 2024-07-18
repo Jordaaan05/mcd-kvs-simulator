@@ -1,5 +1,5 @@
 import getActiveCAFESides from "../active-stations/activeCAFE"
-import fetchOrders from "../fetch-modules/fetchOrders"
+import { fetchOrders } from "../fetch-modules/fetchOrders"
 
 const cafeRouter = async (stations) => {
     const cafeSides = stations.filter(station => station.group === "CAFE");

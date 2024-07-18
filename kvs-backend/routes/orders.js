@@ -5,6 +5,10 @@ const ordersController = require('../controllers/ordersController');
 // GET all orders
 router.get('/', ordersController.getAllOrders);
 
+// GET last order (DT/FC)
+router.get('/last/DT', ordersController.getLastDTOrder)
+router.get('/last/FC', ordersController.getLastFCOrder)
+
 // POST a new order
 router.post('/', ordersController.createOrder);
 

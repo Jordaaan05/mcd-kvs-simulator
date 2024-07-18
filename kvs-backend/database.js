@@ -17,7 +17,7 @@ const Order = sequelize.define('Order', {
     autoIncrement: true
   },
   orderNumber: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
   },
   location: {
     type: DataTypes.STRING,
@@ -51,6 +51,12 @@ const Order = sequelize.define('Order', {
   parked: {
     type: DataTypes.BOOLEAN,
     default: false
+  },
+  orderLocation: {
+    type: DataTypes.STRING
+  },
+  eatInTakeOut: {
+    type: DataTypes.STRING
   }
   // You can add more fields as needed
 });

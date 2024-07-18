@@ -34,7 +34,7 @@ function FC1() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders`);
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.FC1).filter(order => order.sendToKVS.includes("FC1")); // Skip orders with servedTime
       setOrders(filteredOrders);
     } catch (error) {
@@ -44,7 +44,7 @@ function FC1() {
 
   const fetchRecentServedOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders`);
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
 
       const recentServedOrders = response.data.filter(order => {
         if (order.served?.FC1) {
@@ -75,7 +75,7 @@ function FC1() {
         FC1: servedTimestamp,
       },
     };
-    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:5000/orders/${id}`, updatedOrder);
+    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
 
     fetchOrders();
     fetchRecentServedOrders();
@@ -152,7 +152,7 @@ function FC1() {
                 <div className="order-header">
                   {renderHeader && (
                     <div className='order-header-contents'>
-                      <span className="eat-in-take-out"></span>
+                      <span className="eat-in-take-out">{order.eatInTakeOut}</span>
                       <span className="order-location">{order.location}</span>
                       <span className="order-id">{order.registerNumber}-{order.orderNumber || "00"}</span>
                     </div>
@@ -168,8 +168,9 @@ function FC1() {
                 <div className="order-footer" style={getOrderFooterStyle(order.createdAt)}>
                   {renderFooterText && (
                     <div className='order-footer-text'>
-                      <span className='order-status'>{order.status}</span>
                       <span className='order-mfySide'>Side {order.mfySide}</span>
+                      <span className='order-status'>{order.status}</span>
+                      <span className='order-location'>{order.orderLocation}</span>
                       <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
                     </div>
                   )}

@@ -1,5 +1,13 @@
 const { Order, Item, Category } = require('../database'); // Adjust the path as per your project structure
 
+/*
+  TODO:
+  All more GET functions, to make the program more efficient, so that for example,
+  when the KVS fetches orders, it does not fetch all those that are served when it is
+  just trying to fetch a new order. Should also be so that the unneeded data isn't being
+  requested from the DB to begin with.
+*/
+
 // Get all orders
 const getAllOrders = async (req, res) => {
   try {
@@ -18,9 +26,59 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const getLastDTOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      where: {
+        location: 'DT'
+      },
+      include: [
+        {
+          model: Item,
+          include: Category
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    if (order) {
+      res.json(order)
+    } else {
+      res.status(404).json({ message: 'No orders found' })
+    } 
+  } catch (err) {
+    console.error('Error fetching last order:', err);
+    res.status(500).json({ error: 'Failed to fetch last order' });
+  }
+}
+
+const getLastFCOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      where: {
+        location: 'FC'
+      },
+      include: [
+        {
+          model: Item,
+          include: Category
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    if (order) {
+      res.json(order)
+    } else {
+      res.status(404).json({ message: 'No orders found' })
+    } 
+  } catch (err) {
+    console.error('Error fetching last order:', err);
+    res.status(500).json({ error: 'Failed to fetch last order' });
+  }
+}
+
 // Create a new order
 const createOrder = async (req, res) => {
-  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber } = req.body;
+  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut } = req.body;
 
   try {
     const newOrder = await Order.create({
@@ -31,7 +89,9 @@ const createOrder = async (req, res) => {
       timestamp,
       FCSide,
       sendToKVS: kvsToSendTo,
-      registerNumber: registerNumber
+      registerNumber: registerNumber,
+      orderLocation: orderLocation,
+      eatInTakeOut: eatInTakeOut,
     });
 
     const itemPromises = items.map(async (item) => {
@@ -96,5 +156,7 @@ module.exports = {
   getAllOrders,
   createOrder,
   updateOrderStatus,
-  deleteOrder
+  deleteOrder,
+  getLastDTOrder,
+  getLastFCOrder
 };
