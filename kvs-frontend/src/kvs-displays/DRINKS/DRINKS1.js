@@ -6,16 +6,16 @@ import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHo
 import fetchStation from '../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
 
-function MFY4() {
+function DRINKS1() {
   const [orders, setOrders] = useState([]);
-  const columns = 2; // Set the number of columns here
+  const columns = 4; // Set the number of columns here
   const [activeIndex, setActiveIndex] = useState(0);
   const itemsPerCard = 12; // Max number of items per card
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
   const [plusOrders, setPlusOrders] = useState(false)
-  const stationName = "MFY4"
+  const stationName = "DRINKS1"
 
 
   useEffect(() => {
@@ -36,7 +36,7 @@ function MFY4() {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
-      const filteredOrders = response.data.filter(order => !order.served?.MFY4).filter(order => order.sendToKVS.includes(stationName)); // Skip orders with servedTime
+      const filteredOrders = response.data.filter(order => !order.served?.DRINKS1).filter(order => order.sendToKVS.includes("DRINKS1")); // Skip orders with servedTime
       setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
     } catch (error) {
@@ -49,8 +49,8 @@ function MFY4() {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
 
       const recentServedOrders = response.data.filter(order => {
-        if (order.served?.MFY4) {
-          const servedTimestamp = new Date(order.served.MFY4).getTime();
+        if (order.served?.DRINKS1) {
+          const servedTimestamp = new Date(order.served.DRINKS1).getTime();
           const now = new Date().getTime();
           const hoursDifference = (now - servedTimestamp) / (1000 * 60 * 60); // Convert difference to hours
           return hoursDifference <= 24; // Include orders served within the last 24 hours
@@ -64,6 +64,7 @@ function MFY4() {
     }
   };
 
+
   const serveOrder = async (order) => {
     if (!order) return;
     const { id } = order;
@@ -74,7 +75,7 @@ function MFY4() {
       ...orderToUpdate,
       served: {
         ...orderToUpdate.served,
-        MFY4: servedTimestamp,
+        DRINKS1: servedTimestamp,
       },
     };
     await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
@@ -139,20 +140,17 @@ function MFY4() {
 
             const filteredItems = order.Items.slice(i, i + itemsPerCard).filter(item => 
                 item.Categories.some(category => 
-                    category.name === 'Breakfast' || 
-                    category.name === 'Beef' ||
-                    category.name === 'Chicken'
+                    category.name === 'Drinks' || 
+                    category.name === 'Deserts' 
                 )
             ).sort((a, b) => {
                 const categoryA = a.Categories.find(category => 
-                    category.name === 'Breakfast' || 
-                    category.name === 'Beef' ||
-                    category.name === 'Chicken'
+                    category.name === 'Drinks' || 
+                    category.name === 'Deserts' 
                 );
                 const categoryB = b.Categories.find(category => 
-                    category.name === 'Breakfast' || 
-                    category.name === 'Beef' ||
-                    category.name === 'Chicken'
+                    category.name === 'Drinks' || 
+                    category.name === 'Deserts' 
                 );
                 
                 if (categoryA.sortID !== categoryB.sortID) {
@@ -217,4 +215,4 @@ function MFY4() {
   );
 }
 
-export default MFY4;
+export default DRINKS1;

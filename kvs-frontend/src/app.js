@@ -9,6 +9,8 @@ import FC2 from './kvs-displays/FC/FC2';
 import DTPark from './DTPark';
 import Cafe1 from './Cafe1';
 import Cafe2 from './Cafe2'; */
+import DRINKS1 from './kvs-displays/DRINKS/DRINKS1';
+import GRILL1 from './kvs-displays/GRILL/GRILL1';
 import AdminPage from './Admin';
 import './css/App.css';
 
@@ -29,6 +31,10 @@ const App = () => {
           return <FC1 />;
         case 'fc2':
           return <FC2 />;
+        case 'drinks1':
+          return <DRINKS1 />
+        case 'grill1':
+          return <GRILL1 />
         case 'admin':
           return <AdminPage />;
         default:
@@ -47,6 +53,8 @@ const App = () => {
                 <button onClick={() => setActivePage('dtpark')}>DT PARK</button>
                 <button onClick={() => setActivePage('cafe1')}>McCafe Side 1</button>
                 <button onClick={() => setActivePage('cafe2')}>McCafe Side 2</button>
+                <button onClick={() => setActivePage('drinks1')}>DRINKS</button>
+                <button onClick={() => setActivePage('grill1')}>GRILL</button>
                 <button onClick={() => setActivePage('admin')}>Admin Page</button>
               </div>
             </div>

@@ -14,6 +14,7 @@ function FC1() {
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
+  const [plusOrders, setPlusOrders] = useState(false);
   const stationName = "FC1"
 
 
@@ -30,12 +31,15 @@ function FC1() {
     fetchInitialData();
     const interval = setInterval(fetchOrders, 1000); // Update every second
     return () => clearInterval(interval);
+    // stuipid confused by the fetchOrder in order-router
+    // eslint-disable-next-line
   }, []);
 
   const fetchOrders = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.FC1).filter(order => order.sendToKVS.includes("FC1")); // Skip orders with servedTime
+      setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -120,9 +124,11 @@ function FC1() {
   return (
     <div className="App kvs-background">
       <div className={`orders-container columns-${columns}`}>
-        {orders.flatMap((order, orderIndex) => {
+        {orders.slice(0,(columns*2)).flatMap((order, orderIndex) => {
           const cards = [];
           const numCards = Math.ceil(order.Items.length / itemsPerCard)
+          
+          const renderSideNumber = order.sendToKVS.includes("MFY1") || order.sendToKVS.includes("MFY2") || order.sendToKVS.includes("MFY3") || order.sendToKVS.includes("MFY4")
 
           for (let i = 0; i < order.Items.length; i += itemsPerCard) {          
             const cardClass = 
@@ -168,7 +174,9 @@ function FC1() {
                 <div className="order-footer" style={getOrderFooterStyle(order.createdAt)}>
                   {renderFooterText && (
                     <div className='order-footer-text'>
-                      <span className='order-mfySide'>Side {order.mfySide}</span>
+                      {renderSideNumber && (
+                        <span className='order-mfySide'>Side {order.mfySide}</span>
+                      )}
                       <span className='order-status'>{order.status}</span>
                       <span className='order-location'>{order.orderLocation}</span>
                       <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
@@ -185,6 +193,12 @@ function FC1() {
         <div className='station-statistics'>
           <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}</span>
         </div>
+
+        {plusOrders && (
+          <div className='plus-orders'>
+            <span className='num-plus-orders'>{orders.length - (columns * 2)} More orders &gt;&gt;</span>
+          </div>
+        )}
 
         <div className="order-actions">
           <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>

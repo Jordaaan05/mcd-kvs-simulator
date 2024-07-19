@@ -5,6 +5,6 @@ When running, first go to the admin page and press the three add all/import butt
 
 This is a very much work in progress project.
 
-# Disclaimer:
+## Disclaimer:
 This repository contains software that has been heavily inspired by the operations of a McDonald's Restaurant. 
 All code contained within this repository is independently developed and does not contain any proprietary code, or intellectual property.

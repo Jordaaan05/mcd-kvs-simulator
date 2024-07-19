@@ -8,5 +8,3 @@ export const defaultCategories = [
     { name: 'Deserts', sortID: 5},
     { name: 'Condiments', sortID: 6}
 ]
-
-const desiredCategories = ["Breakfast", "Beef", "Chicken", "Sides", "Drinks", "McCafe", "Condiments", "Deserts"]

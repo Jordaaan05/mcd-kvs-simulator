@@ -14,6 +14,7 @@ function MFY1() {
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
+  const [plusOrders, setPlusOrders] = useState(false)
   const stationName = "MFY1"
 
 
@@ -36,6 +37,7 @@ function MFY1() {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.MFY1).filter(order => order.sendToKVS.includes("MFY1")); // Skip orders with servedTime
+      setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -121,7 +123,7 @@ function MFY1() {
   return (
     <div className="App kvs-background">
       <div className={`orders-container columns-${columns}`}>
-        {orders.flatMap((order, orderIndex) => {
+        {orders.slice(0,(columns*2)).flatMap((order, orderIndex) => {
           const cards = [];
           const numCards = Math.ceil(order.Items.length / itemsPerCard)
 
@@ -198,6 +200,12 @@ function MFY1() {
         <div className='station-statistics'>
           <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}</span>
         </div>
+
+        {plusOrders && (
+          <div className='plus-orders'>
+            <span className='num-plus-orders'>{orders.length - (columns * 2)} More orders &gt;&gt;</span>
+          </div>
+        )}
 
         <div className="order-actions">
           <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>

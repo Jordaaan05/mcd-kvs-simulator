@@ -60,11 +60,7 @@ const routeOrder = async (newOrder) => {
     let orderLocation = ""
     let eatInTakeOut = ""
     let orderLocationInStore = ""
-
-    // route to MFY
-    const mfySideName = await mfyRouter(stations)
-    const mfySide = parseInt(mfySideName.slice(3), 10);
-    relevantKVS.push(mfySideName)
+    let mfySide = ""
 
     const registerNumber = newOrder.registerNumber
     const registerValue = parseInt(registerNumber.slice(1), 10);
@@ -108,29 +104,50 @@ const routeOrder = async (newOrder) => {
         console.log("Inputted register number is a non existent register.")
     }
     
+    let alreadyProcessedCategories = []
     for (const item of newOrder.items) {
         const currentItem = items.find(i => i.id === item.id)
         const categoryName = currentItem.Categories[0].name;
-
+        if (alreadyProcessedCategories.includes(categoryName)) {
+            continue
+        }
+        
         if (categoryName === "Beef") {
             if (!relevantKVS.includes("GRILL1")) {
                 relevantKVS.push("GRILL1")
             }
-        } else if (categoryName === "McCafe") {
+            if (!relevantKVS.includes("MFY1") || !relevantKVS.includes("MFY2") || !relevantKVS.includes("MFY3") || !relevantKVS.includes("MFY4")) {            
+                const mfySideName = await mfyRouter(stations)
+                mfySide = parseInt(mfySideName.slice(3), 10);
+                relevantKVS.push(mfySideName)
+            }
+        } 
+        if (categoryName === "Chicken" || categoryName === "Breakfast") {
+            if (!relevantKVS.includes("MFY1") || !relevantKVS.includes("MFY2") || !relevantKVS.includes("MFY3") || !relevantKVS.includes("MFY4")) {            
+                const mfySideName = await mfyRouter(stations)
+                mfySide = parseInt(mfySideName.slice(3), 10);
+                relevantKVS.push(mfySideName)
+            }
+        } 
+        if (categoryName === "McCafe") {
             if (!relevantKVS.includes ("CAFE1") || !relevantKVS.includes("CAFE2")) {
                 // mccafe load balancer
                 const cafeSideName = await cafeRouter(stations);
                 relevantKVS.push(cafeSideName);
             }
-        } else if (categoryName === "Drinks" || categoryName === "Deserts") {
+        } 
+        if (categoryName === "Drinks" || categoryName === "Deserts") {
             if (!relevantKVS.includes("DRINKS1")) {
                 relevantKVS.push("DRINKS1")
             }
-        } else if (categoryName === "Sides") {
+        } 
+        if (categoryName === "Sides") {
             if (!relevantKVS.includes("FRY1")) {
                 relevantKVS.push("FRY1")
             }
         }
+
+        alreadyProcessedCategories.push(categoryName)
     }
 
     const orderToAdd = {
