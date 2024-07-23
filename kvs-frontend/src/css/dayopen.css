@@ -1,0 +1,32 @@
+.dayopen-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e50001;
+}
+
+.dayopen-logo {
+    width: 150px; /* Adjust size as needed */
+    height: auto;
+}
+
+.loading-dots {
+    display: flex;
+    margin-top: 20px;
+}
+
+.loading-dot {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: rgb(255, 232, 25);
+    opacity: 0.2;
+    transition: opacity 0.5s;
+}
+
+.loading-dot.active {
+    opacity: 1;
+}

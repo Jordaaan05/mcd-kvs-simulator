@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MFY1 from './kvs-displays/MFY/MFY1';
 import MFY2 from './kvs-displays/MFY/MFY2';
 import MFY3 from './kvs-displays/MFY/MFY3';
@@ -12,11 +12,37 @@ import Cafe2 from './Cafe2'; */
 import DRINKS1 from './kvs-displays/DRINKS/DRINKS1';
 import GRILL1 from './kvs-displays/GRILL/GRILL1';
 import AdminPage from './Admin';
+import DayOpen from './dayopen';
 import './css/App.css';
 
 const App = () => {
     const [activePage, setActivePage] = useState('home');
+    const [originalPage, setOriginalPage] = useState();
+
+    useEffect(() => {
+      const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === 'STORE_INFO_UPDATED') {
+          setOriginalPage(activePage)
+          setActivePage('day_open');
   
+          setTimeout(() => {
+            setActivePage(originalPage);
+          }, 60000) // redirects to the day open page for 60 seconds.
+        }
+      }
+
+      ws.onclose = () => {
+        console.log("WebSocket connection closed")
+      }
+
+      return () => {
+        ws.close()
+      }
+    }, [activePage, originalPage])
+
     const renderPage = () => {
       switch (activePage) {
         case 'mfy1':
@@ -37,6 +63,8 @@ const App = () => {
           return <GRILL1 />
         case 'admin':
           return <AdminPage />;
+        case 'day_open':
+          return <DayOpen />
         default:
           return (
             <div>

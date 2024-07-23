@@ -35,7 +35,7 @@ function MFY3() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.MFY3).filter(order => order.sendToKVS.includes(stationName)); // Skip orders with servedTime
       setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
@@ -46,7 +46,7 @@ function MFY3() {
 
   const fetchRecentServedOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
 
       const recentServedOrders = response.data.filter(order => {
         if (order.served?.MFY3) {
@@ -77,7 +77,7 @@ function MFY3() {
         MFY3: servedTimestamp,
       },
     };
-    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
+    await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
 
     fetchOrders();
     fetchRecentServedOrders();

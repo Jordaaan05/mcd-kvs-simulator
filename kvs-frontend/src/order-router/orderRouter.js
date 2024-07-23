@@ -162,7 +162,7 @@ const routeOrder = async (newOrder) => {
     }
 
     try {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`, orderToAdd)
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`, orderToAdd)
         console.log('Order added successfully');
     } catch (error) {
         console.error('Error adding order:', error)

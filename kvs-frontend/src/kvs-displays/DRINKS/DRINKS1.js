@@ -35,7 +35,7 @@ function DRINKS1() {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
       const filteredOrders = response.data.filter(order => !order.served?.DRINKS1).filter(order => order.sendToKVS.includes("DRINKS1")); // Skip orders with servedTime
       setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
@@ -46,7 +46,7 @@ function DRINKS1() {
 
   const fetchRecentServedOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
 
       const recentServedOrders = response.data.filter(order => {
         if (order.served?.DRINKS1) {
@@ -78,7 +78,7 @@ function DRINKS1() {
         DRINKS1: servedTimestamp,
       },
     };
-    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
+    await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
 
     fetchOrders();
     fetchRecentServedOrders();

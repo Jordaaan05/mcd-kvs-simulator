@@ -18,7 +18,7 @@ function Admin() {
 
   const fetchOptions = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`);
       setOptions(response.data); // Assuming response.data is an array of items from your database
     } catch (error) {
       console.error('Error fetching options:', error);
@@ -27,7 +27,7 @@ function Admin() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`);
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -36,7 +36,7 @@ function Admin() {
 
   const fetchStations = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`);
       setStations(response.data);
     } catch (error) {
       console.error('Error fetching stations:', error)
@@ -45,7 +45,7 @@ function Admin() {
 
   const fetchCurrentBusinessDay = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/latest`);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/latest`);
       if (!response.data) {
         const pastDate = 1718090268969 // 31 days prior to 12/07/24 @ 7:18pm, just an abitrary past date.
         setCurrentBusinessDay(pastDate)
@@ -107,7 +107,7 @@ function Admin() {
     setNewOrder({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
     /*
     try {
-      await axios.post('http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders', orderToAdd)
+      await axios.post('http://http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders', orderToAdd)
       console.log('Order added successfully');
       setNewOrder({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
       setNewItem({ amount: '', name: '', category: '', display: '' });
@@ -120,14 +120,14 @@ function Admin() {
   const handleAddItem = async (menuItem) => {
     try {
       if (menuItem) {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
           name: menuItem.name,
           category: menuItem.category, // Adjust as per your backend schema
           price: menuItem.price, // Adjust as per your backend schema
           display: menuItem.display
         });
       } else {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
           name: newItem.name,
           category: newItem.category, // Adjust as per your backend schema
           price: newItem.price, // Adjust as per your backend schema
@@ -145,12 +145,12 @@ function Admin() {
   const handleAddCategory = async (categoryName) => {
     try {
       if (categoryName) {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
           name: categoryName.name,
           sortID: categoryName.sortID
         });
       } else {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
           name: newCategory.name,
           sortID: newCategory.sortID
         });
@@ -202,7 +202,7 @@ function Admin() {
 
       const stationExists = stations.find(station => station.name === kvsDisplay.name)
       if (!stationExists) {
-        await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`, {
+        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`, {
           name: kvsDisplay.name,
           group: kvsDisplay.group,
           displayName: kvsDisplay.displayName
@@ -226,7 +226,7 @@ function Admin() {
       return
     }
 
-    await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store`, {
+    await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store`, {
       businessDate: newBusinessDay
     })
 

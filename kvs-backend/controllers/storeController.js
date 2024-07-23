@@ -1,4 +1,5 @@
 const { Store } = require('../database')
+const { broadcastMessage } = require('../modules/websocket')
 
 const getCurrentStoreInfo = async (req, res) => {
     try {
@@ -17,6 +18,8 @@ const insertCurrentStoreInfo = async (req, res) => {
         const newStoreInfo = await Store.create({
             currentBusinessDay: businessDate
         });
+
+        broadcastMessage({ type: "STORE_INFO_UPDATED", data: newStoreInfo });
 
         res.status(201).json(newStoreInfo)
     } catch (err) {
