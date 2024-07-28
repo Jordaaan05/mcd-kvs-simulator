@@ -5,6 +5,8 @@ import { menuItems } from './default_store/menuItems';
 import { kvsDisplays } from './default_store/kvsDisplays';
 import { defaultCategories } from './default_store/categories';
 import routeOrder from './order-router/orderRouter';
+import importSettings from './setup-modules/import-settings';
+import importStations from './setup-modules/import-stations'
 
 function Admin() {
   const [newOrder, setNewOrder] = useState({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
@@ -194,27 +196,6 @@ function Admin() {
     fetchCategories();
   }
 
-  const importStations = async () => {
-    for (let kvsDisplay of kvsDisplays) {
-      if (!kvsDisplay.displayName) {
-        kvsDisplay.displayName = kvsDisplay.name
-      }
-
-      const stationExists = stations.find(station => station.name === kvsDisplay.name)
-      if (!stationExists) {
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`, {
-          name: kvsDisplay.name,
-          group: kvsDisplay.group,
-          displayName: kvsDisplay.displayName
-        })
-        console.log('Station added successfully');
-      } else {
-        console.log('Station already exists...')
-      }
-    }
-    fetchStations();
-  }
-
   const openNewBusinessDay = async () => {
     const newBusinessDay = new Date();
 
@@ -330,6 +311,7 @@ function Admin() {
         <button onClick={generateCategory}>Add all categories</button>
         <button onClick={assignItemsToCategories}>Assign Items to Categories</button>
         <button onClick={importStations}>Import stations from file</button>
+        <button onClick={importSettings}>Import settings from file</button>
         <br></br>
         <button onClick={openNewBusinessDay} className={`button ${dayStatus === "RED" ? "button-red" : "button-green"}`}>Open next business day</button>
         <br></br>

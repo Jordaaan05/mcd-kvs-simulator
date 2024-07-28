@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../css/BasicKVS.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
-import { averageTimestampDifferenceLastHour, averageTimestampDifferenceLast24Hours } from '../modules/calculateAverageTimes';
-import fetchStation from '../modules/fetch/fetchStations';
-import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
+import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
+import fetchStation from '../../modules/fetch/fetchStations';
+import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
 
 function FC1() {
   const [orders, setOrders] = useState([]);
@@ -14,7 +14,7 @@ function FC1() {
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
-  const [plusOrders, setPlusOrders] = useState(false);
+  const [plusOrders, setPlusOrders] = useState(false)
   const stationName = "FC1"
 
 
@@ -29,11 +29,42 @@ function FC1() {
     };
 
     fetchInitialData();
-    const interval = setInterval(fetchOrders, 1000); // Update every second
-    return () => clearInterval(interval);
-    // stuipid confused by the fetchOrder in order-router
-    // eslint-disable-next-line
+    /*const interval = setInterval(fetchOrders, 1000); // Update every second
+    return () => clearInterval(interval);*/
+
+    const ws = new WebSocket(`ws:/${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
+
+    ws.onmessage= async (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "NEW_ORDER") {
+        if (message.data[1].includes("FC1")) {
+          const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`) // where message.data is the ID of the new order.
+          setOrders(prevOrders => {
+            const updatedOrders = [...prevOrders, response.data];
+            setPlusOrders(updatedOrders.length > (columns * 2));
+            return updatedOrders
+          });
+        }
+      }
+    }
+
+    return () => {
+      ws.close();
+    };
   }, []);
+
+  useEffect(() => {
+    // Update timestamp every second
+    const interval = setInterval(() => {
+      setOrders(prevOrders => 
+        prevOrders.map(order => ({
+          ...order,
+          formattedTime: formatTimeToSeconds(order.createdAt),
+        }))
+      );
+    }, 1000);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [orders]);
 
   const fetchOrders = async () => {
     try {
@@ -71,7 +102,8 @@ function FC1() {
     const { id } = order;
     const servedTimestamp = new Date();
 
-    const orderToUpdate = orders.find(order => order.id === id);
+    const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`)
+    const orderToUpdate = response.data
     const updatedOrder = {
       ...orderToUpdate,
       served: {
@@ -152,7 +184,6 @@ function FC1() {
                     return a.ID - b.ID;
                 }
             });
-
             cards.push(
               <div className={`order-card ${cardClass} ${getOrderBorderStyle(orderIndex)}`} key={`${order.id}-${i}`}>
                 <div className="order-header">
@@ -179,7 +210,7 @@ function FC1() {
                       )}
                       <span className='order-status'>{order.status}</span>
                       <span className='order-location'>{order.orderLocation}</span>
-                      <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
+                    <span className='order-timestamp'>{order.formattedTime || formatTimeToSeconds(order.createdAt)}</span>
                     </div>
                   )}
                 </div>

@@ -3,8 +3,8 @@ import axios from 'axios';
 import '../../css/BasicKVS.css';
 import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
-import fetchStation from '../modules/fetch/fetchStations';
-import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
+import fetchStation from '../../modules/fetch/fetchStations';
+import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
 
 function MFY2() {
   const [orders, setOrders] = useState([]);
@@ -29,9 +29,42 @@ function MFY2() {
     };
 
     fetchInitialData();
-    const interval = setInterval(fetchOrders, 1000); // Update every second
-    return () => clearInterval(interval);
+    /*const interval = setInterval(fetchOrders, 1000); // Update every second
+    return () => clearInterval(interval);*/
+
+    const ws = new WebSocket(`ws:/${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
+
+    ws.onmessage= async (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "NEW_ORDER") {
+        if (message.data[1].includes("MFY2")) {
+          const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`) // where message.data is the ID of the new order.
+          setOrders(prevOrders => {
+            const updatedOrders = [...prevOrders, response.data];
+            setPlusOrders(updatedOrders.length > (columns * 2));
+            return updatedOrders
+          });
+        }
+      }
+    }
+
+    return () => {
+      ws.close();
+    };
   }, []);
+
+  useEffect(() => {
+    // Update timestamp every second
+    const interval = setInterval(() => {
+      setOrders(prevOrders => 
+        prevOrders.map(order => ({
+          ...order,
+          formattedTime: formatTimeToSeconds(order.createdAt),
+        }))
+      );
+    }, 1000);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [orders]);
 
   const fetchOrders = async () => {
     try {
@@ -69,7 +102,8 @@ function MFY2() {
     const { id } = order;
     const servedTimestamp = new Date();
 
-    const orderToUpdate = orders.find(order => order.id === id);
+    const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`)
+    const orderToUpdate = response.data
     const updatedOrder = {
       ...orderToUpdate,
       served: {
@@ -185,7 +219,7 @@ function MFY2() {
                     <span className='order-mfySide'> </span>
                     <span className='order-status'>{order.status}</span>
                     <span className='order-location'>{order.orderLocation}</span>
-                    <span className='order-timestamp'>{formatTimeToSeconds(order.createdAt)}</span>
+                    <span className='order-timestamp'>{order.formattedTime || formatTimeToSeconds(order.createdAt)}</span>
                   </div>
                   )}
                 </div>

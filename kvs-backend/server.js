@@ -7,6 +7,7 @@ const optionsRouter = require('./routes/options')
 const categoriesRouter = require('./routes/categories')
 const stationsRouter = require('./routes/stations')
 const storeRouter = require('./routes/store')
+const settingsRouter = require('./routes/settings')
 const { initialiseWebSocket } = require('./modules/websocket')
 
 
@@ -20,6 +21,7 @@ app.use('/options', optionsRouter);
 app.use('/categories', categoriesRouter)
 app.use('/stations', stationsRouter)
 app.use('/store', storeRouter)
+app.use('/settings', settingsRouter)
 
 const PORT = process.env.PORT || 5000;
 

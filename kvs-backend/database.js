@@ -145,6 +145,34 @@ const Store = sequelize.define('Store', {
   }
 })
 
+const Settings = sequelize.define('Settings', {
+  /*
+    The following settings are auto-generated into this table:
+    Generator-Enabled: true/false,
+    Num-IPS: 1,2,3,4,
+    Num-FC: 1,2,
+    Store-Size: Food Court, Small, Medium, Large,
+    Order-Arrival-Rate: Slow, Typical, Peak, Max
+
+    Note that the store size setting likely would affect number of IPs and FC sides, 
+    with Food Court having 1 of each, Small having 2 IPs and 1 FC, Medium having 3 or 4 IPs,
+    and large being 4 IPs and 2 FC. These are still stored in the database for sake of simplicity.
+  */
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  value: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+})
+
 // Define relationships (if any)
 Order.belongsToMany(Item, { through: OrderItems });
 Item.belongsToMany(Order, { through: OrderItems });
@@ -168,5 +196,6 @@ module.exports = {
   OrderItems,
   ItemCategory,
   Stations,
-  Store
+  Store,
+  Settings
 };

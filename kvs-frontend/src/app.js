@@ -13,11 +13,18 @@ import DRINKS1 from './kvs-displays/DRINKS/DRINKS1';
 import GRILL1 from './kvs-displays/GRILL/GRILL1';
 import AdminPage from './Admin';
 import DayOpen from './dayopen';
+import Setup from './setup';
 import './css/App.css';
 
 const App = () => {
     const [activePage, setActivePage] = useState('home');
-    const [originalPage, setOriginalPage] = useState();
+
+    // when the active page is not home, the order generator should be active if it is toggled on.
+
+    const handlePageChange = (page) => {
+      sessionStorage.setItem('originalPage', page); // Set into localStorage here to persist the data across sessions, useful for allocating devices to certain displays. Use localStorage for a proper deployment.
+      setActivePage(page);
+    };
 
     useEffect(() => {
       const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
@@ -25,11 +32,11 @@ const App = () => {
       ws.onmessage = (event) => {
         const message = JSON.parse(event.data);
         if (message.type === 'STORE_INFO_UPDATED') {
-          setOriginalPage(activePage)
           setActivePage('day_open');
   
           setTimeout(() => {
-            setActivePage(originalPage);
+            const savedOriginalPage = sessionStorage.getItem('originalPage');
+            setActivePage(savedOriginalPage || 'home');
           }, 60000) // redirects to the day open page for 60 seconds.
         }
       }
@@ -41,7 +48,7 @@ const App = () => {
       return () => {
         ws.close()
       }
-    }, [activePage, originalPage])
+    }, [activePage])
 
     const renderPage = () => {
       switch (activePage) {
@@ -65,25 +72,28 @@ const App = () => {
           return <AdminPage />;
         case 'day_open':
           return <DayOpen />
+        case 'setup':
+          return <Setup />
         default:
           return (
             <div>
               <h1>KVS Simulator</h1>
               <h2>Please select the active display required below.</h2>
               <div className="button-container">
-                <button onClick={() => setActivePage('mfy1')}>MFY Side 1</button>
-                <button onClick={() => setActivePage('mfy2')}>MFY Side 2</button>
-                <button onClick={() => setActivePage('mfy3')}>MFY Side 3</button>
-                <button onClick={() => setActivePage('mfy4')}>MFY Side 4</button>
-                <button onClick={() => setActivePage('fc1')}>FC Side 1</button>
-                <button onClick={() => setActivePage('fc2')}>FC Side 2</button>
-                <button onClick={() => setActivePage('dt')}>DT</button>
-                <button onClick={() => setActivePage('dtpark')}>DT PARK</button>
-                <button onClick={() => setActivePage('cafe1')}>McCafe Side 1</button>
-                <button onClick={() => setActivePage('cafe2')}>McCafe Side 2</button>
-                <button onClick={() => setActivePage('drinks1')}>DRINKS</button>
-                <button onClick={() => setActivePage('grill1')}>GRILL</button>
-                <button onClick={() => setActivePage('admin')}>Admin Page</button>
+                <button onClick={() => handlePageChange('mfy1')}>MFY Side 1</button>
+                <button onClick={() => handlePageChange('mfy2')}>MFY Side 2</button>
+                <button onClick={() => handlePageChange('mfy3')}>MFY Side 3</button>
+                <button onClick={() => handlePageChange('mfy4')}>MFY Side 4</button>
+                <button onClick={() => handlePageChange('fc1')}>FC Side 1</button>
+                <button onClick={() => handlePageChange('fc2')}>FC Side 2</button>
+                <button onClick={() => handlePageChange('dt')}>DT</button>
+                <button onClick={() => handlePageChange('dtpark')}>DT PARK</button>
+                <button onClick={() => handlePageChange('cafe1')}>McCafe Side 1</button>
+                <button onClick={() => handlePageChange('cafe2')}>McCafe Side 2</button>
+                <button onClick={() => handlePageChange('drinks1')}>DRINKS</button>
+                <button onClick={() => handlePageChange('grill1')}>GRILL</button>
+                <button onClick={() => handlePageChange('admin')}>Admin Page</button>
+                <button onClick={() => handlePageChange('setup')}>Setup Page</button>
               </div>
             </div>
           );

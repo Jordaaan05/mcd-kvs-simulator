@@ -5,6 +5,9 @@ const ordersController = require('../controllers/ordersController');
 // GET all orders
 router.get('/', ordersController.getAllOrders);
 
+// fetch orders by id
+router.get('/:id', ordersController.fetchOrderByID)
+
 // GET last order (DT/FC)
 router.get('/last/DT', ordersController.getLastDTOrder)
 router.get('/last/FC', ordersController.getLastFCOrder)

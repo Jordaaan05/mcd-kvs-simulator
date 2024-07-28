@@ -1,4 +1,5 @@
 const { Order, Item, Category } = require('../database'); // Adjust the path as per your project structure
+const { broadcastMessage } = require('../modules/websocket')
 
 /*
   TODO:
@@ -76,6 +77,29 @@ const getLastFCOrder = async (req, res) => {
   }
 }
 
+const fetchOrderByID = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const order = await Order.findByPk(id, { 
+      include: [
+        {
+          model: Item,
+          include: Category
+        }
+      ]
+     });
+    if (order) {
+      res.json(order)
+    } else {
+      res.status(404).json({ message: 'No orders found' })
+    } 
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+}
+
 // Create a new order
 const createOrder = async (req, res) => {
   const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut } = req.body;
@@ -101,6 +125,8 @@ const createOrder = async (req, res) => {
       }
     });
     await Promise.all(itemPromises)
+
+    broadcastMessage({ type: "NEW_ORDER", data: [newOrder.id, kvsToSendTo] })
 
     res.status(201).json(newOrder);
   } catch (err) {
@@ -158,5 +184,6 @@ module.exports = {
   updateOrderStatus,
   deleteOrder,
   getLastDTOrder,
-  getLastFCOrder
+  getLastFCOrder,
+  fetchOrderByID
 };
