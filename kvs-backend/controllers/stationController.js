@@ -11,13 +11,14 @@ const getAllStations = async (req, res) => {
 }
 
 const createStation = async (req, res) => {
-    const { name, group, displayName } = req.body; 
+    const { name, group, status, displayName } = req.body; 
 
     try {
         const newStation = await Stations.create({
             name,
             group,
-            displayName
+            displayName,
+            status
         });
 
         res.status(201).json(newStation)

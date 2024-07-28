@@ -122,7 +122,6 @@ const Stations = sequelize.define('Stations', {
   },
   status: {
     type: DataTypes.STRING,
-    defaultValue: "ON"
   },
   group: {
     type: DataTypes.STRING,
