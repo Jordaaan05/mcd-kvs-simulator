@@ -1,10 +1,10 @@
 export const defaultSettings = [
-    { name: "Generator-Enabled", value: "False"},
+    { name: "Generator-Enabled", value: "Off"},
     { name: "Num-IPS", value: "4"},
     { name: "Num-FC", value: "2"},
-    { name: "Store-Size", value: "Large"},
-    { name: "Order-Arrival-Rate", value: "Max"},
-    { name: "Average-Order-Size", value: "0"},
+    { name: "Store-Size", value: "Food Court"},
+    { name: "Order-Arrival-Rate", value: "Off"},
+    { name: "Average-Order-Size", value: "Off"},
     { name: "Rush-Period", value: "Off"}
 ]
 
@@ -16,16 +16,25 @@ Settings Explained:
 
     Num-IPS:
         Changes the number of MFY screens that are enabled.
+        Can be any integer 1 through 4.
 
     Num-FC:
         Changes the number of FC sides that are enabled.
+        Can be 1 or 2.
 
     Store-Size:
         Affects the order arrival rate, as obviously we do not want a single sided food court to receive the order load of a $6,000+ store...
+        Note that if an Order-Arrival-Rate is set, the store size will not affect this.
+        Possible values:
+        Food Court: 1 IP, 1 FC, Low order arrival rates. Does not change the value for Order-Arrival-Rate though. (Default)
+        Small: 2 IP, 1 FC, Still low arival rates, but more than Food Court levels.
+        Medium: 3 IP, 2 FC, Medium level arrival rates
+        Large: 4 IP, 2 FC, High order arrival rates
 
     Order-Arrival-Rate:
         Self explanatory, affects the rate at which orders arrive.
         Possible values include:
+        Off: Let Store-Size affect the rate at which orders arrive. (Default)
         Slow: Less than 1 order per minute
         Typical: Around an order per minute
         Peak: 2-4 orders per minute
@@ -33,8 +42,8 @@ Settings Explained:
         Note these values are for a Large store, for a small store or a foodcourt, the peak value would likely become the MAX value, etc.
 
     Average-Order-Size:
-        Ability to manipulate the average number of sandwhiches per order, forsay if the default is larger than your store, or if you are not as used to larger orders.
-        Default is 0 for off, letting the order generator have full control over everything.
+        Ability to manipulate the average number of sandwiches per order, forsay if the default is larger than your store, or if you are not as used to larger orders.
+        Default is Off, letting the order generator have full control over everything.
         Possible values are 1-3, and the generator has a huge bias to this number, only +- a few less than half the time
 
     Rush-Period:

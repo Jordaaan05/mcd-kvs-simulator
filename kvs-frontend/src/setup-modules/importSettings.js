@@ -3,7 +3,7 @@
 */
 import { defaultSettings } from "../default_store/defaultSettings"
 import axios from "axios"
-import fetchSettings from "../modules/fetch/fetch-settings"
+import fetchSettings from "../modules/fetch/fetchSettings"
 
 const importSettings = async () => {
     const currentSettings = await fetchSettings() || []
@@ -24,6 +24,7 @@ const importSettings = async () => {
             console.log('Setting already exists... skipping')
         }
     }
+    return
 }
 
 export default importSettings

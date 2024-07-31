@@ -14,6 +14,10 @@ const getAllSettings = async (req, res) => {
 const createSetting = async (req, res) => {
     const { name, value } = req.body
 
+    if (name == "Setup-Complete") {
+        broadcastMessage({ type: "SETUP-COMPLETE", data: "TRUE"})
+    }
+
     try {
         const newSetting = await Settings.create({
             name: name,

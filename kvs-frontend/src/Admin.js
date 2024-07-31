@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './css/Admin.css';
 import { menuItems } from './default_store/menuItems';
-import { kvsDisplays } from './default_store/kvsDisplays';
 import { defaultCategories } from './default_store/categories';
 import routeOrder from './order-router/orderRouter';
-import importSettings from './setup-modules/import-settings';
-import importStations from './setup-modules/import-stations'
+import importSettings from './setup-modules/importSettings';
+import importStations from './setup-modules/importStations'
 
 function Admin() {
   const [newOrder, setNewOrder] = useState({ orderNumber: '', location: '', items: [], status: '', mfySide: '', FCSide: '', sendToKVS: '' });
@@ -14,14 +13,13 @@ function Admin() {
   const [newCategory, setNewCategory] = useState({ name: '', sortID: '' });
   const [options, setOptions] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [stations, setStations] = useState([]);
   const [currentBusinessDay, setCurrentBusinessDay] = useState(0);
   const [dayStatus, setDayStatus] = useState("GREEN")
 
   const fetchOptions = async () => {
     try {
       const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`);
-      setOptions(response.data); // Assuming response.data is an array of items from your database
+      setOptions(response.data); 
     } catch (error) {
       console.error('Error fetching options:', error);
     }
@@ -33,15 +31,6 @@ function Admin() {
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error)
-    }
-  }
-
-  const fetchStations = async () => {
-    try {
-      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`);
-      setStations(response.data);
-    } catch (error) {
-      console.error('Error fetching stations:', error)
     }
   }
 

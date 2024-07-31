@@ -16,7 +16,10 @@ function DayOpen () {
                     dot.classList.remove('active')
                 }
             })
-            currentIndex = (currentIndex + 1) % (dots.length)
+            currentIndex = (currentIndex + 1) % (dots.length + 1)
+            if (currentIndex === 0) {
+                dots.forEach(dot => dot.classList.remove('active')); // Reset dots when currentIndex resets
+            }
         }, 750)
 
         return () => clearInterval(interval)

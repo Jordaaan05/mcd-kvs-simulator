@@ -26,6 +26,7 @@ const importStations = async () => {
         console.log('Station already exists...')
       }
     }
+    return
   }
 
 export default importStations
