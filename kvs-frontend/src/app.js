@@ -114,7 +114,6 @@ const App = () => {
                   <button onClick={() => handlePageChange('grill1')}>GRILL</button>
                   <button onClick={() => handlePageChange('admin')}>Admin Page</button>
                   <button onClick={() => handlePageChange('settings')}>Settings Page</button>
-                  <button onClick={() => handlePageChange('setup')}>Setup Page</button>
                 </>
                 ) : (
                   <button onClick={() => handlePageChange('setup')}>Setup Page</button>

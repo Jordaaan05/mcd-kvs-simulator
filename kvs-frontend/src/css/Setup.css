@@ -1,9 +1,17 @@
+h1 {
+    margin-top: 0;
+    padding-top: 21.44px;
+}
+
 .App {
     text-align: center;
     font-family: Arial, sans-serif;
     height: 100vh;
-  }
+}
   
+.settings {
+    background-color: lightgoldenrodyellow;
+}
 
 .button {
     color: white;
@@ -59,14 +67,14 @@
     display: flex;
     justify-content: space-between;
     padding: 2px;
-    width: 75%;
+    width: 90%;
     margin: auto;
     gap: 5px;
 }
 
 .button-row button {
     appearance: none;
-    background-color: transparent;
+    background-color: white;
     border: 2px solid #1A1A1A;
     border-radius: 15px;
     box-sizing: border-box;
@@ -112,9 +120,19 @@
 
 .button-row button.active {
     box-shadow: none;
-    transform: translateY(0);
+    transform: translateY(2px);
     background-color: #1A1A1A;
     opacity: 80%;
     color: #fff;
-    border-color: aliceblue;
+    border-color: #1A1A1A;
+}
+
+.button-group {
+    width: 85%;
+    margin: auto;
+    border: 2px solid #1A1A1A;
+    border-radius: 15px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    background-color: lightgray;
 }

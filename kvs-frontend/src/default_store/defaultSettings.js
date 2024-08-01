@@ -2,10 +2,13 @@ export const defaultSettings = [
     { name: "Generator-Enabled", value: "Off"},
     { name: "Num-IPS", value: "4"},
     { name: "Num-FC", value: "2"},
+    { name: "Num-McCafe", value: "2"},
     { name: "Store-Size", value: "Food Court"},
     { name: "Order-Arrival-Rate", value: "Off"},
     { name: "Average-Order-Size", value: "Off"},
-    { name: "Rush-Period", value: "Off"}
+    { name: "Rush-Period", value: "Off"},
+    { name: "Drive-Enabled", value: "Off"},
+    { name: "Station-Lock", value: "Off"}
 ]
 
 /*
@@ -22,6 +25,10 @@ Settings Explained:
         Changes the number of FC sides that are enabled.
         Can be 1 or 2.
 
+    Num-McCafe:
+        Changes the number of enabled McCafe sides
+        Can be 1 or 2 (default is 2)
+    
     Store-Size:
         Affects the order arrival rate, as obviously we do not want a single sided food court to receive the order load of a $6,000+ store...
         Note that if an Order-Arrival-Rate is set, the store size will not affect this.
