@@ -118,7 +118,17 @@ const createOrder = async (req, res) => {
       eatInTakeOut: eatInTakeOut,
     });
 
-    const itemPromises = items.map(async (item) => {
+    const groupedItems = items.reduce((acc, item) => {
+      const itemAmount = parseInt(item.amount, 10)
+      if (acc[item.name]) {
+        acc[item.name].amount = (parseInt(acc[item.name].amount, 10) + itemAmount).toString()
+      } else {
+        acc[item.name] = { ...item, amount: itemAmount.toString() }
+      }
+      return acc;
+    }, {});
+
+    const itemPromises = Object.values(groupedItems).map(async (item) => {
       const dbItem = await Item.findOne({ where: {name: item.name } });
       if (dbItem) {
         await newOrder.addItem(dbItem, { through: { amount: item.amount } });

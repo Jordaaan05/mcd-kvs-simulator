@@ -253,3 +253,17 @@
 .num-plus-orders {
   font-weight: bold;
 }
+
+.time {
+  position: absolute;
+  bottom: 55px;
+  background-color: gray;
+  font-weight: 600;
+  font-size: large;
+  left: 0%;
+}
+
+.current-time {
+  font-weight: bold;
+  color: #f0f0f0;
+}

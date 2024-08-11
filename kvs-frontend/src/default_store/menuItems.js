@@ -1,8 +1,16 @@
 export const menuItems = [
+    { name: 'Cheeseburger', category: 'Beef', price: 4.60},
     { name: 'Big Mac', category: 'Beef', price: 7.99 },
+    { name: 'Quarter Pounder', category: 'Beef', price: 8.49, display: "Qtr Pounder"},
+    { name: 'Double Quarter Pounder', category: 'Beef', price: 9.99, display: 'Dbl Qtr Pounder'},
     { name: 'McChicken', category: 'Chicken', price: 6.99 },
-    { name: 'Medium Fries', category: 'Sides', price: 4.50, display: "M Fry"},
     { name: 'Bacon & Egg McMuffin', category: 'Breakfast', price: 6.70 }, 
+    { name: 'Hash Brown', category: 'Sides', price: 3.60 },
+    { name: '2 Hash Brown', category: 'Sides', price: 5.50, display: "Hash Brwn x2"},
+    { name: 'Small Fries', category: 'Sides', price: 3.60, display: "S Fry"},
+    { name: 'Medium Fries', category: 'Sides', price: 4.50, display: "M Fry"},
     { name: 'Large Fries', category: 'Sides', price: 5.50, display: "L Fry" },
-    { name: 'Large Coke', category: 'Drinks', price: 4.50, display: "L Coke"}
+    { name: 'Small Coke', category: 'Drinks', price: 4.50, display: "S Coke"},
+    { name: 'Medium Coke', category: 'Drinks', price: 4.50, display: "M Coke"},
+    { name: 'Large Coke', category: 'Drinks', price: 4.50, display: "L Coke"},
 ]

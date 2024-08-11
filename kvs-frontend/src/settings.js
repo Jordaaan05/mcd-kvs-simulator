@@ -73,7 +73,7 @@ function Settings({ handlePageChange }) {
             "Slow": ["Standard arrival rates for early morning/after dinner."],
             "Typical": ["Typical arrival rates for a pre-rush period"],
             "Peak": ["Standard rush hour level of order arrival."],
-            "Max": ["Maximum possible level of order arrival that the store can support."]
+            "Max": ["Maximum possible level of order arrival that the store can (comfortably) support."]
         },
 
         "Average Order Size": {

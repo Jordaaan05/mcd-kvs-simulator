@@ -5,6 +5,7 @@ import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
 import fetchStation from '../../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
+import get24HrTime from '../modules/get24hTime';
 
 function MFY2() {
   const [orders, setOrders] = useState([]);
@@ -142,8 +143,8 @@ function MFY2() {
   const getOrderFooterStyle = (timestamp) => {
     const now = new Date();
     const difference = Math.floor((now - new Date(timestamp)) / 1000);
-    if (difference >= 120) return { backgroundColor: 'red' };
-    if (difference >= 60) return { backgroundColor: 'orange' };
+    if (difference >= 60) return { backgroundColor: 'red' };
+    if (difference >= 30) return { backgroundColor: 'orange' };
     return { backgroundColor: 'grey' };
   };
 
@@ -239,6 +240,10 @@ function MFY2() {
             <span className='num-plus-orders'>{orders.length - (columns * 2)} More orders &gt;&gt;</span>
           </div>
         )}
+
+        <div className='time'>
+          <span className='current-time'>{get24HrTime()}</span>
+        </div>
 
         <div className="order-actions">
           <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>

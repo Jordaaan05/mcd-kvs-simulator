@@ -10,6 +10,7 @@ const storeRouter = require('./routes/store')
 const settingsRouter = require('./routes/settings')
 const { initialiseWebSocket } = require('./modules/websocket')
 
+const { executeOrderGenerator } = require('./order-generator/executeOrderGenerator')
 
 const app = express();
 app.use(cors());
@@ -29,6 +30,8 @@ const PORT = process.env.PORT || 5000;
 sequelize.authenticate()
   .then(() => {
     console.log('Database connected');
+
+    executeOrderGenerator()
 
     const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

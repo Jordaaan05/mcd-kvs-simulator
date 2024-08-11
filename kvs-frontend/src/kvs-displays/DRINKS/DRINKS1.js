@@ -5,6 +5,7 @@ import toggleStationStatus from '../modules/toggleStationStatus'
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from '../modules/calculateAverageTimes';
 import fetchStation from '../../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
+import get24HrTime from '../modules/get24hTime';
 
 function DRINKS1() {
   const [orders, setOrders] = useState([]);
@@ -236,6 +237,10 @@ function DRINKS1() {
             <span className='num-plus-orders'>{orders.length - (columns * 2)} More orders &gt;&gt;</span>
           </div>
         )}
+
+        <div className='time'>
+          <span className='current-time'>{get24HrTime()}</span>
+        </div>
 
         <div className="order-actions">
           <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>
