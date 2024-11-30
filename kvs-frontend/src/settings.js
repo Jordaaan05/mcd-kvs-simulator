@@ -7,7 +7,9 @@ import fetchSettings from "./modules/fetch/fetchSettings";
 import axios from "axios";
 import './css/Setup.css'
 
-function Settings({ handlePageChange }) {
+import DashNav from "./dashboard/dash-nav";
+
+function Settings({ handlePageChange, activePage }) {
     const [settings, setSettings] = useState([])
     const [setupComplete, setSetupComplete] = useState(false)
 
@@ -98,13 +100,16 @@ function Settings({ handlePageChange }) {
 
         "Station Lock": {
             "Off": ["By selecting a different option, you can lock to a specific station, so that a singular area of the store is simulated", "Currently set to 'Off', so all areas of the store will be simulated."],
-            "Kitchen": ["Locks the entire program into simulating only the first side of the MFY line.", "All other order-based settings will still apply."],
-            "Front Counter": ["Locks the entire program into simulating only the first Front Counter side.", "All other order-based settings will still apply."]
+            "Kitchen": ["Locks the entire program into simulating only the first side of the MFY line., for practicing the initator role.", "All other order-based settings will still apply."],
+            "Front Counter": ["Locks the entire program into simulating only the first Front Counter side, for practicing the assembler role for either Drive Thru or Front Counter orders.", "All other order-based settings will still apply."]
         } 
     }
 
     return (
         <div className="App">
+            {setupComplete && (
+                <DashNav handlePageChange={handlePageChange} activePage={activePage} />
+            )}
             <div className="settings">
                 <h1>Settings</h1>
 
@@ -151,7 +156,7 @@ function Settings({ handlePageChange }) {
                     );
                 })}
                 {setupComplete ? (
-                    <button onClick={() => handlePageChange('home')}>Back to home</button>
+                    <button onClick={() => handlePageChange('dashhome')}>Back to home</button>
                 ) : (
                     <button onClick={() => handlePageChange('setup')}>Back to setup</button>
                 )}

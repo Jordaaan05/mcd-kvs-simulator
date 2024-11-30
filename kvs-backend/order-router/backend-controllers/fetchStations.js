@@ -2,7 +2,7 @@
     Fetches the station data required for the orderRouter from the DB
 */
 
-const { Stations } = require('../../database')
+const { Stations } = require('../../database/database')
 
 const fetchStations = async () => {
     try {

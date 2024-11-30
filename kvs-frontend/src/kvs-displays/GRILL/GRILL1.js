@@ -6,16 +6,19 @@ import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHo
 import fetchStation from '../../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
 import get24HrTime from '../modules/get24hTime';
+import renderRecalledOrder from '../../modules/render/renderRecalledOrder'
 
 function GRILL1() {
   const [orders, setOrders] = useState([]);
-  const columns = 2; // Set the number of columns here
   const [activeIndex, setActiveIndex] = useState(0);
-  const itemsPerCard = 12; // Max number of items per card
   const [servedOrders, setServedOrders] = useState([]);
   const [currentStation, setCurrentStation] = useState([])
   const [currentBusinessDay, setCurrentBusinessDay] = useState();
   const [plusOrders, setPlusOrders] = useState(false)
+  const [recallMode, setRecallMode] = useState(false)
+  const [recalledOrder, setRecalledOrder] = useState(0)
+  const columns = 2; 
+  const itemsPerCard = 12;
   const stationName = "GRILL1"
 
 
@@ -26,7 +29,6 @@ function GRILL1() {
       setCurrentStation(stationData);
       const businessDayData = await fetchCurrentBusinessDay();
       setCurrentBusinessDay(businessDayData)
-      fetchRecentServedOrders();
     };
 
     fetchInitialData();
@@ -38,7 +40,7 @@ function GRILL1() {
     ws.onmessage= async (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "NEW_ORDER") {
-        if (message.data[1].includes("GRILL1")) {
+        if (message.data[1].includes(stationName)) {
           const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`) // where message.data is the ID of the new order.
           setOrders(prevOrders => {
             const updatedOrders = [...prevOrders, response.data];
@@ -67,10 +69,16 @@ function GRILL1() {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [orders]);
 
+  useEffect(() => {
+    if (currentBusinessDay) {
+      fetchRecentServedOrders()
+    }// eslint-disable-next-line
+  }, [currentBusinessDay])
+
   const fetchOrders = async () => {
     try {
       const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
-      const filteredOrders = response.data.filter(order => !order.served?.GRILL1).filter(order => order.sendToKVS.includes("GRILL1")); // Skip orders with servedTime
+      const filteredOrders = response.data.filter(order => !order.served?.GRILL1).filter(order => order.sendToKVS.includes(stationName)); // Skip orders with servedTime
       setPlusOrders(filteredOrders.length > (columns * 2))
       setOrders(filteredOrders);
     } catch (error) {
@@ -80,23 +88,24 @@ function GRILL1() {
 
   const fetchRecentServedOrders = async () => {
     try {
-      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
-
-      const recentServedOrders = response.data.filter(order => {
-        if (order.served?.GRILL1) {
-          const servedTimestamp = new Date(order.served.GRILL1).getTime();
-          const now = new Date().getTime();
-          const hoursDifference = (now - servedTimestamp) / (1000 * 60 * 60); // Convert difference to hours
-          return hoursDifference <= 24; // Include orders served within the last 24 hours
-        }
-        return false; // Only include orders with servedTime
-      });
-
-      setServedOrders(recentServedOrders);
+      const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${currentBusinessDay}/station/${stationName}`);
+      const orders = response.data
+      setServedOrders(orders);
     } catch (error) {
       console.error('Error fetching recent served orders:', error);
     }
   };
+
+  const recallLastOrder = () => {
+    if (recallMode) {
+      setRecallMode(false)
+    } else {
+      if (servedOrders.length > 0) {
+        setRecallMode(true)
+        setRecalledOrder(0)
+      }
+    }
+  }
 
   const serveOrder = async (order) => {
     if (!order) return;
@@ -120,11 +129,19 @@ function GRILL1() {
   };
   
   const selectPreviousOrder = () => {
+    if (recallMode) {
+      setRecalledOrder(prevIndex => (prevIndex < servedOrders.length - 1 ? prevIndex + 1 : servedOrders.length - 1));
+    } else {
     setActiveIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : orders.length - 1));
+    }
   };
   
   const selectNextOrder = () => {
+    if (recallMode) {
+      setRecalledOrder(prevIndex => (prevIndex > 0 ? prevIndex - 1 : 0));
+    } else {
     setActiveIndex(prevIndex => (prevIndex < orders.length - 1 ? prevIndex + 1 : 0));
+    }
   };
   
   const handleStationToggle = async () => {
@@ -221,9 +238,10 @@ function GRILL1() {
               </div>
             )
           }
-          
           return cards;
         })}
+
+        {recallMode && renderRecalledOrder(servedOrders, recalledOrder, itemsPerCard, columns)}
 
         <div className='station-statistics'>
           <span className='station-stats'>All / {currentStation.displayName} <span className={`station-status ${currentStation.status}`}>{currentStation.status}</span> {averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/{averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}</span>
@@ -243,6 +261,7 @@ function GRILL1() {
           <button onClick={() => serveOrder(orders[activeIndex])} className='serve-button'>Serve</button>
           <button onClick={selectPreviousOrder} className='prev-next-button'>Prev</button>
           <button onClick={selectNextOrder} className='prev-next-button'>Next</button>
+          <button onClick={recallLastOrder} className='recall-button'>Recall</button>
           <button onClick={handleStationToggle} className='on-off-button'>Side ON/OFF</button>
         </div>
       </div>

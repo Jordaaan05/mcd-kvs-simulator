@@ -1,4 +1,4 @@
-const { Settings } = require("../database")
+const { Settings } = require("../database/database")
 const { broadcastMessage } = require('../modules/websocket')
 
 const getAllSettings = async (req, res) => {

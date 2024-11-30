@@ -1,5 +1,6 @@
-const { Order, Item, Category } = require('../database'); // Adjust the path as per your project structure
+const { Order, Item, Category } = require('../database/database'); // Adjust the path as per your project structure
 const { broadcastMessage } = require('../modules/websocket')
+const { Op } = require('sequelize')
 
 /*
   TODO:
@@ -100,9 +101,76 @@ const fetchOrderByID = async (req, res) => {
   }
 }
 
+const fetchServedOrderByBizDay = async (req, res) => {
+  const { businessDay, stationName } = req.params
+
+  try {
+    let orders = await Order.findAll({
+      include: [
+        {
+          model: Item,
+          include: Category,
+        },
+      ],
+      where: {
+        businessDay: businessDay,
+        served: {
+          [Op.not]: null,
+        }
+      },
+      order: [['createdAt', 'DESC']],
+    });
+    orders = orders.filter(order => {
+      const served = order.served || {};
+      return served[stationName] !== undefined && served[stationName] !== null;
+    }); 
+
+    if (orders.length > 0) {
+      res.json(orders);
+    } else {
+      res.status(404).json({ message: 'No orders found' });
+    }
+  } catch (err) {
+    console.error(`Error fetching orders:`, err)
+    res.status(500).json({ error: 'Failed to fetch orders' })
+  }
+}
+
+const fetchOrderByBizDay = async (req, res) => {
+  const { businessDay, stationName } = req.params
+
+  try {
+    let orders = await Order.findAll({
+      include: [
+        {
+          model: Item,
+          include: Category,
+        },
+      ],
+      where: {
+        businessDay: businessDay,
+        served: null,
+      },
+      order: [['createdAt', 'DESC']],
+    });
+    orders = orders.filter(order => {
+      return order.sendToKVS.includes(stationName)
+    }); 
+
+    if (orders.length > 0) {
+      res.json(orders);
+    } else {
+      res.status(404).json({ message: 'No orders found' });
+    }
+  } catch (err) {
+    console.error(`Error fetching orders:`, err)
+    res.status(500).json({ error: 'Failed to fetch orders' })
+  }
+}
+
 // Create a new order
 const createOrder = async (req, res) => {
-  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut } = req.body;
+  const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut, businessDay } = req.body;
 
   try {
     const newOrder = await Order.create({
@@ -116,6 +184,7 @@ const createOrder = async (req, res) => {
       registerNumber: registerNumber,
       orderLocation: orderLocation,
       eatInTakeOut: eatInTakeOut,
+      businessDay: businessDay,
     });
 
     const groupedItems = items.reduce((acc, item) => {
@@ -195,5 +264,7 @@ module.exports = {
   deleteOrder,
   getLastDTOrder,
   getLastFCOrder,
-  fetchOrderByID
+  fetchOrderByID,
+  fetchServedOrderByBizDay,
+  fetchOrderByBizDay
 };

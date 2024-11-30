@@ -42,11 +42,11 @@ const storeCharacteristics = {
         Lunch: 0.0625,
         Dinner: 0.25,
         Overnight: 0.125,
-        "Friday Night": 0.4,
+        "Friday Night": 0.2,
     },
 }
 
-const generateOrder = (currentSettings, currentItems) => {
+const generateOrder = (currentSettings, currentItems, currentBusinessDay) => {
     console.log("Executing Generate Order...")
 
     const time = translateCurrentTime(currentSettings) // Gets the current time in form of { time, time in text (Breakfast, Lunch....) }
@@ -56,7 +56,7 @@ const generateOrder = (currentSettings, currentItems) => {
     if (currentSettings.find(setting => setting.name === "Rush-Period").value !== "Off") {
         timeOfDay = currentSettings.find(setting => setting.name === "Rush-Period").value
     }
-    let order = { items: [] }
+    let order = { items: [], businessDay: currentBusinessDay }
 
     const baseRate = calculateBaseRate(currentSettings, currentHour, storeCharacteristics)
     if (Math.random() < baseRate) {
@@ -92,12 +92,16 @@ const generateOrder = (currentSettings, currentItems) => {
         }
 
         if (coffeeOnly === true) {
-            // trigger coffee generator
+            const size = Math.random();
+            const selectedSize = size < 0.2 ? "Small" : size < 0.55 ? "Medium" : "Large";
+            generateCoffee(currentItems, selectedSize)
             return order
         }
 
         if (drinkOnly === true) {
-            // trigger drink generator
+            const size = Math.random();
+            const selectedSize = size < 0.2 ? "Small" : size < 0.55 ? "Medium" : "Large";
+            generateDrink(currentItems, selectedSize)
             return order
         }
 
@@ -165,6 +169,31 @@ const generateOrder = (currentSettings, currentItems) => {
                 }
             } else {
                 // breakfast menu rules apply
+                if (Math.random() < 0.75) { // 75% of orders will be combo
+                    let breakfastItem
+                    const size = Math.random();
+                    const selectedSize = size < 0.33 ? "Small" : size < 0.66 ? "Medium" : "Large";
+
+                    breakfastItem = weightedSelectByCategory(currentItems, "Breakfast")
+                    order = {...order, items: [...order.items, { id: breakfastItem.id, name: breakfastItem.name, amount: 1 }] }
+                    
+                    if (Math.random() < 0.2) { // 20% chance for a normal fountain drink
+                        let drink = generateDrink(currentItems, size)
+                        order = {...order, items: [...order.items, { id: drink.id, name: drink.name, amount: 1 }]}
+                    } else { // otherwise coffee
+                        let drink = generateCoffee(currentItems, size)
+                        order = {...order, items: [...order.items, { id: drink.id, name: drink.name, amount: 1 }]}
+                    }
+                    
+                    if (Math.random < 0.9) {
+                        let sides = generateSides(currentItems, size, true) // will generate hashbrowns only
+                        order = {...order, items: [...order.items, { id: sides.id, name: sides.name, amount: 1}]}
+                    } else { // for the other weird 10% who get fries at breakfast time
+                        let sides = generateSides(currentItems, size, true)
+                        order = {...order, items: [...order.items, { id: sides.id, name: sides.name, amount: 1}]}
+                    }
+                    
+                }
             }
         }
         console.log("Generating Order...")
@@ -193,6 +222,13 @@ const generateDeserts = (currentItems, size) => {
     actualSize = size === "Small" ? "Small" : size === "Medium" ? "Small" : "Large"
     desert = weightedSelectByCategory(currentItems, categoryName, actualSize)
     return desert
+}
+
+const generateCoffee = (currentItems, size) => {
+    const categoryName = "McCafe"
+
+    coffee = weightedSelectByCategory(currentItems, categoryName, size)
+    return coffee
 }
 
 module.exports = { generateOrder }

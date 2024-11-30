@@ -8,7 +8,8 @@ export const defaultSettings = [
     { name: "Average-Order-Size", value: "Off"},
     { name: "Rush-Period", value: "Off"},
     { name: "Drive-Enabled", value: "Off"},
-    { name: "Station-Lock", value: "Off"}
+    { name: "Station-Lock", value: "Off"},
+    { name: "Simulated-Time", value: "None"},
 ]
 
 /*
@@ -63,5 +64,23 @@ Settings Explained:
         Friday Dinner - Same as dinner but the order arrival rate is higher, MAX peak can go up to $6,500. 
         Again note that the other states are only for when one of these rush periods is wanted to be locked in. If left off, the system will generate orders based on the real date and time.
 
+    Drive-Enabled:
+        Self explanatory really, 
+        Off: Drive Thru is disabled, even if called for by the store size
+        On: Drive Thru is enabled, but only if the store size calls for it.
+
+    Station-Lock:
+        Ability to be able to lock into a certain station
+        Off: Entire restaurant is simulated
+        Kitchen: Only MFY1 is enabled, and orders are only generated for this station. For initiator practice
+        Front Counter: Only FC1 is enabled, and orders are only generated for this station, For practice for assembly, which can apply to either DT or FC.
+
+    Simulated-Time:
+        Ability to change the time that the program is operating in, to simulate a rush period more realistically,
+        None: Uses the system time, everything runs as normal
+        10-12: Sets the clock to 10:00, and simulates from then up until 12:00, resetting back to None once this period has completed. 
+        12-2: Sets the clock to 12:00, simulates to 14:00. Resets once the period is over
+        5-8: Sets the clock to 17:00, simulates until 20:00. 
+        These settings are only intended to cover the main rush periods of the day, more may be added in future.
     All of these settings are changable within the setup page.
 */

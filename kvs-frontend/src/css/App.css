@@ -5,9 +5,38 @@
     gap: 10px;
   }
   
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.error-display {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #f13123;
+  color: white;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.error-message {
+  margin-bottom: 5px;
+}
+
+.error-message-button {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.error-message-button:hover {
+  color: black;
+}

@@ -2,7 +2,7 @@
     Fetches the required order information for the order router from the DB
 */
 
-const { Order, Item, Category } = require('../../database')
+const { Order, Item, Category } = require('../../database/database')
 
 const fetchOrders = async (stationName) => {
     try {

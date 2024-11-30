@@ -1,6 +1,7 @@
 // database.js
 
 const { Sequelize, DataTypes } = require('sequelize');
+const defineUser = require('./user')
 
 // Initialize SQLite database connection
 const sequelize = new Sequelize({
@@ -8,6 +9,8 @@ const sequelize = new Sequelize({
   storage: './database.sqlite', // SQLite database file path
   logging: false // Disable logging (you may enable it for debugging)
 });
+
+const User = defineUser(sequelize)
 
 // Define models
 const Order = sequelize.define('Order', {
@@ -57,8 +60,10 @@ const Order = sequelize.define('Order', {
   },
   eatInTakeOut: {
     type: DataTypes.STRING
-  }
-  // You can add more fields as needed
+  },
+  businessDay: {
+    type: DataTypes.STRING
+  },
 });
 
 // Define Items model (for options like burgers, drinks, etc.)
@@ -172,6 +177,7 @@ const Settings = sequelize.define('Settings', {
   }
 })
 
+
 // Define relationships (if any)
 Order.belongsToMany(Item, { through: OrderItems });
 Item.belongsToMany(Order, { through: OrderItems });
@@ -196,5 +202,6 @@ module.exports = {
   ItemCategory,
   Stations,
   Store,
-  Settings
+  Settings,
+  User
 };

@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { sequelize } = require('./database');
+const { sequelize } = require('./database/database');
 const ordersRouter = require('./routes/orders');
 const optionsRouter = require('./routes/options')
 const categoriesRouter = require('./routes/categories')
 const stationsRouter = require('./routes/stations')
 const storeRouter = require('./routes/store')
 const settingsRouter = require('./routes/settings')
+const authRouter = require('./auth/authRoutes')
 const { initialiseWebSocket } = require('./modules/websocket')
 
 const { executeOrderGenerator } = require('./order-generator/executeOrderGenerator')
@@ -23,6 +24,7 @@ app.use('/categories', categoriesRouter)
 app.use('/stations', stationsRouter)
 app.use('/store', storeRouter)
 app.use('/settings', settingsRouter)
+app.use('/api/auth', authRouter)
 
 const PORT = process.env.PORT || 5000;
 

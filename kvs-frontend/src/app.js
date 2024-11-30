@@ -15,8 +15,16 @@ import AdminPage from './Admin';
 import DayOpen from './dayopen';
 import Setup from './setup';
 import Settings from './settings';
+import DashLogin from './dashboard/dash-login';
+import DashSignup from './dashboard/dash-signup';
+import DashHome from './dashboard/dashhome';
+import DashStations from './dashboard/modify/dash-stations'
 import axios from 'axios';
 import './css/App.css';
+
+import { AuthProvider } from './authContext'; 
+import { ErrorProvider } from './modules/error-display/errorContext'
+import ErrorDisplay from './modules/error-display/errorDisplay'
 
 const App = () => {
     const [activePage, setActivePage] = useState('home');
@@ -95,7 +103,15 @@ const App = () => {
         case 'setup':
           return <Setup handlePageChange={handlePageChange}/>
         case 'settings':
-          return <Settings handlePageChange={handlePageChange}/>
+          return <Settings handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'login':
+          return <DashLogin handlePageChange={handlePageChange}/>
+        case 'signup':
+          return <DashSignup handlePageChange={handlePageChange}/>
+        case 'dashhome':
+          return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'dashstations':
+          return <DashStations handlePageChange={handlePageChange} activePage={activePage}/>
         default:
           return (
             <div>
@@ -114,6 +130,7 @@ const App = () => {
                   <button onClick={() => handlePageChange('grill1')}>GRILL</button>
                   <button onClick={() => handlePageChange('admin')}>Admin Page</button>
                   <button onClick={() => handlePageChange('settings')}>Settings Page</button>
+                  <button onClick={() => handlePageChange('dashhome')}>Managers Dashboard</button>
                 </>
                 ) : (
                   <button onClick={() => handlePageChange('setup')}>Setup Page</button>
@@ -124,7 +141,16 @@ const App = () => {
       }
     };
   
-    return <div className="App">{renderPage()}</div>;
+    return (
+      <AuthProvider>
+      <ErrorProvider>
+        <ErrorDisplay currentPage={activePage} />
+        <div className="App">
+          {renderPage()}
+        </div>
+      </ErrorProvider>
+    </AuthProvider>
+    );
   };
 
 export default App;

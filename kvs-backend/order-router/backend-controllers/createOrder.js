@@ -2,11 +2,11 @@
     Module for putting orders into the DB without the use of HTTP
 */
 
-const { Order, Item } = require("../../database")  
+const { Order, Item } = require("../../database/database")  
 const { broadcastMessage } = require("../../modules/websocket")
 
 const createOrder = async (order) => {
-    const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut } = order
+    const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut, businessDay } = order
   
     try {
       const newOrder = await Order.create({
@@ -20,6 +20,7 @@ const createOrder = async (order) => {
         registerNumber: registerNumber,
         orderLocation: orderLocation,
         eatInTakeOut: eatInTakeOut,
+        businessDay: businessDay,
       });
   
       const groupedItems = items.reduce((acc, item) => {

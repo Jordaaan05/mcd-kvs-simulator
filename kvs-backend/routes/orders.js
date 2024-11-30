@@ -8,6 +8,10 @@ router.get('/', ordersController.getAllOrders);
 // fetch orders by id
 router.get('/:id', ordersController.fetchOrderByID)
 
+// fetch served orders newer than the business day
+router.get('/day/:businessDay/station/:stationName', ordersController.fetchServedOrderByBizDay)
+router.get('/day/:businessDay/station/:stationName/new', ordersController.fetchOrderByBizDay)
+
 // GET last order (DT/FC)
 router.get('/last/DT', ordersController.getLastDTOrder)
 router.get('/last/FC', ordersController.getLastFCOrder)

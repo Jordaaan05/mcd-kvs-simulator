@@ -11,5 +11,6 @@ export const kvsDisplays = [
     {name: 'FRY1', group: 'FRY', displayName: 'Fries', status: "ON"},
     {name: 'DT1', group: 'DT', displayName: 'DT RPP', status: "ON"},
     {name: 'DT2', group: 'DT', displayName: 'DT RPP', status: "ON"}, // park display
+    {name: 'DT3', group: 'DT', displayName: 'DT RPP', status: "ON"}, // presenter display
     {name: 'DRINKS1', group: 'DRINKS', displayName: 'DRINKS', status: "ON"},
 ]

@@ -13,4 +13,9 @@ export const menuItems = [
     { name: 'Small Coke', category: 'Drinks', price: 4.50, display: "S Coke"},
     { name: 'Medium Coke', category: 'Drinks', price: 4.50, display: "M Coke"},
     { name: 'Large Coke', category: 'Drinks', price: 4.50, display: "L Coke"},
+    { name: 'Small Hot Fudge Sundae', category: 'Deserts', price: 4.60, display: "S H/Fudge Sundae"},
+    { name: 'Large Hot Fudge Sundae', category: 'Deserts', price: 5.40, display: 'L H/Fudge Sundae'},
+    { name: 'Small Flat White', category: 'McCafe', price: 4.50},
+    { name: 'Medium Flat White', category: 'McCafe', price: 5.20},
+    { name: 'Large Flat White', category: 'McCafe', price: 6.20},
 ]

@@ -1,4 +1,4 @@
-const { Stations } = require('../database');
+const { Stations } = require('../database/database');
 
 const getAllStations = async (req, res) => {
     try {
