@@ -68,7 +68,7 @@ function DashHome({ handlePageChange, activePage }) {
                     <div className='col-md-3 text-center'>
                         <h3>Manager</h3>
                         <p><i>Options</i></p>
-                        <button onClick={() => handlePageChange('stations')}>Modify</button>
+                        <button onClick={() => handlePageChange('dashmanager')}>Modify</button>
                     </div>
                 </div>
             </div>

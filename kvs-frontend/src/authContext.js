@@ -17,10 +17,10 @@ export const AuthProvider = ({ children })=> {
         }
     }, [])
 
-    const register = async (username, password, role) => {
+    const register = async (username, password, role, storeName) => {
         try {
             console.log('creating user...')
-            await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/api/auth/register`, { username, password, role })
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/api/auth/register`, { username, password, role, storeName })
             console.log('created user')
 
             const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/api/auth/login`, { username, password })

@@ -26,7 +26,7 @@ app.use('/store', storeRouter)
 app.use('/settings', settingsRouter)
 app.use('/api/auth', authRouter)
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 // Start server after database connection is established
 sequelize.authenticate()

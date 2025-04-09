@@ -40,8 +40,35 @@ const getMostRecentStoreInfo = async (req, res) => {
     }
 }
 
+const updateBusinessDay = async (req, res) => {
+    const { storeId } = req.params
+    const { businessDate } = req.body;
+
+    try {
+        await Store.update({ currentBusinessDay: businessDate }, { where: { id: storeId } })
+
+        broadcastMessage({ type: "STORE_INFO_UPDATED", data: businessDate })
+    } catch (err) {
+        console.error('Error updating business day:', err);
+    }
+}
+
+const getBusinessDayByID = async (req, res) => {
+    const { storeId } = req.params
+    
+    try {
+        const store = await Store.findOne({ where: {id: storeId}})
+        res.json(store)
+    } catch (err) {
+        console.error('Error fetching store information:', err);
+        res.status(500).json({ error: 'Failed to fetch store information' });
+    }
+}
+
 module.exports = {
     getCurrentStoreInfo,
     insertCurrentStoreInfo,
-    getMostRecentStoreInfo
+    getMostRecentStoreInfo,
+    updateBusinessDay,
+    getBusinessDayByID
 }

@@ -9,6 +9,7 @@ function DashSignup({ handlePageChange }) {
     const { register } = useAuth()
     const [newUsername, setNewUsername] = useState('')
     const [newPassword, setNewPassword] = useState('')
+    const [newStoreName, setNewStoreName] = useState('')
 
     const { isAuthenticated } = useAuth()
     if (isAuthenticated()) {
@@ -18,7 +19,7 @@ function DashSignup({ handlePageChange }) {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            await register(newUsername, newPassword)
+            await register(newUsername, newPassword, 'user' ,newStoreName) // user is the role TEMP
             handlePageChange('dashhome')
         } catch (error) {
             console.error('Registration failed:', error)
@@ -38,6 +39,12 @@ function DashSignup({ handlePageChange }) {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Password"
+            />
+            <input 
+                type="text"
+                value={newStoreName}
+                onChange={(e) => setNewStoreName(e.target.value)}
+                placeholder="Store Name"
             />
             <button type="submit">Sign Up</button>
         </form>

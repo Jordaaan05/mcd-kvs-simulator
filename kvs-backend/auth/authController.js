@@ -3,7 +3,7 @@
 */
 
 const jwt = require("jsonwebtoken")
-const { User } = require("../database/database")
+const { User, Store } = require("../database/database")
 const bcrypt = require("bcrypt")
 const secretKey = process.env.SECRET_KEY || "correctHorseBatteryStaple" // PLEASE CONFIGURE THIS IN YOUR ENV FILE
 
@@ -22,8 +22,15 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid username or password' })
         }
 
+        const store = await Store.findOne({ where: { userId: user.id } })
+
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role },
+            { 
+                id: user.id, 
+                username: user.username, 
+                role: user.role,
+                storeId: store ? store.id : null
+            },
             secretKey,
             { expiresIn: '1h' }
         )
@@ -35,7 +42,8 @@ const login = async (req, res) => {
 }
 
 const register = async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password, role, storeName } = req.body;
+    console.log(storeName)
     try {
         const existingUser = await User.findOne({ where: { username } })
         if (existingUser) {
@@ -47,7 +55,12 @@ const register = async (req, res) => {
             password,
             role: role || 'user'
         })
-        return res.status(200).json({ message: 'Successfully created user:', username})
+
+        const newStore = await Store.create({
+            name: storeName || `${username}'s Store`,
+            userId: newUser.id,
+        })
+        return res.status(200).json({ message: 'Successfully created user/store:', username, storeName})
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
     }

@@ -19,6 +19,7 @@ import DashLogin from './dashboard/dash-login';
 import DashSignup from './dashboard/dash-signup';
 import DashHome from './dashboard/dashhome';
 import DashStations from './dashboard/modify/dash-stations'
+import DashManager from './dashboard/dash-manager';
 import axios from 'axios';
 import './css/App.css';
 
@@ -112,32 +113,15 @@ const App = () => {
           return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
         case 'dashstations':
           return <DashStations handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'dashmanager':
+          return <DashManager handlePageChange={handlePageChange} activePage={activePage}/>
         default:
-          return (
-            <div>
-              <h1>KVS Simulator</h1>
-              <h2>Please select the active display required below.</h2>
-              <div className="button-container">
-              {setupComplete ? (
-                <>
-                  <button onClick={() => handlePageChange('mfy1')}>MFY Side 1</button>
-                  <button onClick={() => handlePageChange('mfy2')}>MFY Side 2</button>
-                  <button onClick={() => handlePageChange('mfy3')}>MFY Side 3</button>
-                  <button onClick={() => handlePageChange('mfy4')}>MFY Side 4</button>
-                  <button onClick={() => handlePageChange('fc1')}>FC Side 1</button>
-                  <button onClick={() => handlePageChange('fc2')}>FC Side 2</button>
-                  <button onClick={() => handlePageChange('drinks1')}>DRINKS</button>
-                  <button onClick={() => handlePageChange('grill1')}>GRILL</button>
-                  <button onClick={() => handlePageChange('admin')}>Admin Page</button>
-                  <button onClick={() => handlePageChange('settings')}>Settings Page</button>
-                  <button onClick={() => handlePageChange('dashhome')}>Managers Dashboard</button>
-                </>
-                ) : (
-                  <button onClick={() => handlePageChange('setup')}>Setup Page</button>
-                )}
-              </div>
-            </div>
-          );
+          if (setupComplete){
+            return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
+          } else {
+            return <Setup handlePageChange={handlePageChange}/>
+          }
+          
       }
     };
   

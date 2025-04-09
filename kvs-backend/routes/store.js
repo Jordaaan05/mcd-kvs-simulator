@@ -7,4 +7,7 @@ router.get('/latest', storeController.getMostRecentStoreInfo)
 
 router.post('/', storeController.insertCurrentStoreInfo)
 
+router.get('/:storeId', storeController.getBusinessDayByID)
+router.post('/:storeId', storeController.updateBusinessDay)
+
 module.exports = router

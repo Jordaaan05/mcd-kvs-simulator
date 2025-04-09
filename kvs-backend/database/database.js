@@ -13,6 +13,29 @@ const sequelize = new Sequelize({
 const User = defineUser(sequelize)
 
 // Define models
+const Store = sequelize.define('Store', { // business day oopsie
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  currentBusinessDay: {
+    type: DataTypes.STRING
+  }, 
+  userId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
+  },
+})
+
 const Order = sequelize.define('Order', {
   id: {
     type: DataTypes.INTEGER,
@@ -138,17 +161,6 @@ const Stations = sequelize.define('Stations', {
 }
 )
 
-const Store = sequelize.define('Store', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  currentBusinessDay: {
-    type: DataTypes.STRING
-  }
-})
-
 const Settings = sequelize.define('Settings', {
   /*
     The following settings are auto-generated into this table:
@@ -177,6 +189,29 @@ const Settings = sequelize.define('Settings', {
   }
 })
 
+const CustomerCount = sequelize.define('CustomerCount', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  intervalStart: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  intervalEnd: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  frontCounterCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  driveThruCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+});
 
 // Define relationships (if any)
 Order.belongsToMany(Item, { through: OrderItems });
@@ -203,5 +238,6 @@ module.exports = {
   Stations,
   Store,
   Settings,
-  User
+  User,
+  CustomerCount
 };
