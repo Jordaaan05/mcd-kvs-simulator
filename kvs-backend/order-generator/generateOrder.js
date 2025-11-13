@@ -193,18 +193,18 @@ const generateOrder = (currentSettings, currentItems, currentBusinessDay, custom
                 order = {...order, items: [...order.items, { id: breakfastItem.id, name: breakfastItem.name, amount: 1 }] }
                 
                 if (Math.random() < 0.2) { // 20% chance for a normal fountain drink
-                    let drink = generateDrink(currentItems, size)
+                    let drink = generateDrink(currentItems, selectedSize)
                     order = {...order, items: [...order.items, { id: drink.id, name: drink.name, amount: 1 }]}
                 } else { // otherwise coffee
-                    let drink = generateCoffee(currentItems, size)
+                    let drink = generateCoffee(currentItems, selectedSize)
                     order = {...order, items: [...order.items, { id: drink.id, name: drink.name, amount: 1 }]}
                 }
                 
                 if (Math.random < 0.9) {
-                    let sides = generateSides(currentItems, size, true) // will generate hashbrowns only
+                    let sides = generateSides(currentItems, selectedSize, true) // will generate hashbrowns only
                     order = {...order, items: [...order.items, { id: sides.id, name: sides.name, amount: 1}]}
                 } else { // for the other weird 10% who get fries at breakfast time
-                    let sides = generateSides(currentItems, size, true)
+                    let sides = generateSides(currentItems, selectedSize, true)
                     order = {...order, items: [...order.items, { id: sides.id, name: sides.name, amount: 1}]}
                 }
                 

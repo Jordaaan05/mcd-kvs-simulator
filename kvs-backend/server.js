@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config()
+
 const bodyParser = require('body-parser');
 const { sequelize } = require('./database/database');
 const ordersRouter = require('./routes/orders');
@@ -11,7 +13,8 @@ const settingsRouter = require('./routes/settings')
 const authRouter = require('./auth/authRoutes')
 const { initialiseWebSocket } = require('./modules/websocket')
 
-const { executeOrderGenerator } = require('./order-generator/executeOrderGenerator')
+const { simulate15MinInterval } = require('./order-generator/executeOrderGenerator') 
+const { loadSampleData } = require('./order-generator/order-data/generateSampleData') 
 
 const app = express();
 app.use(cors());
@@ -33,7 +36,21 @@ sequelize.authenticate()
   .then(() => {
     console.log('Database connected');
 
-    executeOrderGenerator()
+    const sampleData = loadSampleData()
+    simulate15MinInterval(new Date(), sampleData)
+
+    const now = new Date()
+    const msToNextQuarter = (15 - (now.getMinutes() % 15)) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds()
+
+    setTimeout(() => {
+      const sampleData = loadSampleData()
+      simulate15MinInterval(new Date(), sampleData)
+
+      setInterval(() => {
+        const sampleData = loadSampleData()
+        simulate15MinInterval(new Date(), sampleData)
+      }, 15*60*1000)
+    }, msToNextQuarter)
 
     const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

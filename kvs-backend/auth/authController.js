@@ -43,7 +43,6 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
     const { username, password, role, storeName } = req.body;
-    console.log(storeName)
     try {
         const existingUser = await User.findOne({ where: { username } })
         if (existingUser) {

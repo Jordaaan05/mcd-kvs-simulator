@@ -58,6 +58,7 @@ function DashStations({ handlePageChange, activePage }) {
                     }
                 }
                 setRollingHourTimes(times);
+                setActiveOrders(activeOrders)
             } catch (error) {
                 console.error('Failed to fetch rolling hour times:', error);
             } finally {
@@ -85,9 +86,7 @@ function DashStations({ handlePageChange, activePage }) {
         try {
             const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}`);
             const currentDayServedOrders = response.data || [];
-    
             if (currentDayServedOrders.length === 0) {
-                console.log(`No orders found for station: ${station.name}`);
                 return '0'; // No orders found
             }
     
@@ -110,19 +109,20 @@ function DashStations({ handlePageChange, activePage }) {
         try {
             const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}/new`);
             const currentDayActiveOrders = response.data || []
+            console.log("Active orders for station:", station.name, currentDayActiveOrders, currentDayActiveOrders.length)
 
             if (currentDayActiveOrders.length === 0) {
-                console.log(`No orders found for station: ${station.name}`)
                 return '0'
             }
 
-            return currentDayActiveOrders
+            return String(currentDayActiveOrders.length)
         } catch (error) {
             console.error(`Error fetching orders for station: ${station.name}`, error)
             return '0'
         }
     }
 
+    console.log(activeOrders)
     return (
         <div className='dashboard stations'>
             <DashNav handlePageChange={handlePageChange} activePage={activePage} />
@@ -151,7 +151,7 @@ function DashStations({ handlePageChange, activePage }) {
                         <td>{station.displayName}</td>
                         <td>{station.status}</td>
                         <td>{loading ? 'Loading...' : rollingHourTimes[station.name] || '0'}</td>
-                        <td>{loading ? 'Loading...' : activeOrders[station.name] || '0'}</td>
+                        <td>{loading ? 'Loading...' : activeOrders[station.name]}</td>
                         <td>
                             <button className='modify-button' style={{marginRight: "5px"}}onClick={() => handlePageChange(station.name.toLowerCase())}>Access</button>
                         </td>

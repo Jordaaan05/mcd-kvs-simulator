@@ -13,12 +13,21 @@ const assignOrderNumber = async (location) => {
     // i probably shouldve put this in a seperate file like everything else here but oh well lol
     if (lastDTOrderNumber === -1) {
         const lastDTOrder = await fetchLastDTOrder()
-        lastDTOrderNumber = parseInt(lastDTOrder.orderNumber)
+        if (!lastDTOrder) {
+            lastDTOrderNumber = 0
+        } else {
+            lastDTOrderNumber = parseInt(lastDTOrder.orderNumber)
+        }
+        
     }
 
     if (lastFCOrderNumber === -1) {
         const lastFCOrder = await fetchLastFCOrder()
-        lastFCOrderNumber = parseInt(lastFCOrder.orderNumber)
+        if (!lastFCOrder) {
+            lastFCOrderNumber = 0
+        } else {
+            lastFCOrderNumber = parseInt(lastFCOrder.orderNumber) || 0   
+        }
     }
     
     if (location === "DT") {

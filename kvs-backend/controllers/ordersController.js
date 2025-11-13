@@ -149,12 +149,12 @@ const fetchOrderByBizDay = async (req, res) => {
       ],
       where: {
         businessDay: businessDay,
-        served: null,
       },
       order: [['createdAt', 'DESC']],
     });
     orders = orders.filter(order => {
-      return order.sendToKVS.includes(stationName)
+      return order.sendToKVS && order.sendToKVS.includes(stationName) &&
+      (!order.served || !order.served[stationName]);
     }); 
 
     if (orders.length > 0) {

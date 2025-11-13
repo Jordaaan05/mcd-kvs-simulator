@@ -21,18 +21,62 @@ const storeCustomerCount = async (intervalStart, intervalEnd, frontCounterCount,
     }
   };
 
+
+let currentTimeouts = []
 const simulate15MinInterval = async (intervalStart, sampleData) => {
+
+    currentTimeouts.forEach(clearTimeout)
+    currentTimeouts = []
+
     const intervalEnd = new Date(intervalStart.getTime() + 15 * 60 * 1000)
 
-    const currentDay = intervalStart.toLocaleString('en-US', { weekday: 'long' })
-    const currentMonth = intervalStart.toLocaleString('en-US', { month: 'long' })
-    const currentHour = intervalStart.getHours()
-    const currentMinute = intervalStart.getMinutes()
+    const day = intervalStart.getDay();       // 0 (Sun) - 6 (Sat)
+    const month = intervalStart.getMonth();   // 0 (Jan) - 11 (Dec)
+    const hour = intervalStart.getHours();    // 0 - 23
+
+    const key = `${month}-${day}-${hour}`;   // e.g., "11-6-0"
 
     const getCustomerCount = (type) => {
-        const baseCount = 
+        const baseCount = sampleData['data']?.[key]?.[type] ?? 0;
+        return applyVariation(baseCount);
+    };
+
+    try {
+        const frontCounterCount = getCustomerCount('FC');
+        const driveThruCount = getCustomerCount('DT');
+      
+        console.log("Order Scheduler running for interval starting:", `${intervalStart.toLocaleString("en-GB")}`, "\nVolumes:\n   Front:", frontCounterCount, "\n   Drive:", driveThruCount);
+      
+        await storeCustomerCount(intervalStart, intervalEnd, frontCounterCount, driveThruCount);
+      
+        const scheduleOrders = async (count, type) => {
+            const timeRange = 15 * 60 * 1000;
+            let executedIndex = 0
+            for (let i = 0; i < count; i++) {
+                const delay = Math.floor(Math.random() * timeRange);
+                const timeoutId = setTimeout(async () => {
+                    executedIndex++
+                    console.log(`Scheduled order ${executedIndex}/${count} (${type}) after ${delay}ms`);
+                    await executeOrderGenerator(type);
+                }, delay);
+
+                currentTimeouts.push(timeoutId)
+            }
+        };
+      
+        await Promise.all([
+            scheduleOrders(frontCounterCount, 'FC'),
+            // scheduleOrders(driveThruCount, 'DT'), TEMP OFF UNTIL DT IMPLEMENTED
+        ]);
+    } catch (error) {
+      console.error("Error during simulate15MinInterval:", error);
     }
 }
+
+const applyVariation = (baseCount) => {
+  const variationFactor = 1 + (Math.random() * (0.2 + 0.35) - 0.35); // from 0.65 to 1.2
+  return Math.max(0, Math.round(baseCount * variationFactor));
+};
 
 const executeOrderGenerator = async (customerLocation) => {
     let currentSettingsRaw = await Settings.findAll()
@@ -44,4 +88,4 @@ const executeOrderGenerator = async (customerLocation) => {
     }
 }
 
-module.exports = { executeOrderGenerator }
+module.exports = { simulate15MinInterval }

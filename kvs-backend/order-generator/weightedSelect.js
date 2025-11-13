@@ -8,10 +8,10 @@ const weightedSelectByCategory = (items, category, size, breakfastMenu) => {
         console.error(`Category ${category} does not exist/has no assigned items.`)
     }
 
-    return weightedSelect(categoryItems, size, breakfastMenu)
+    return weightedSelect(categoryItems, category, size, breakfastMenu)
 }
 
-const weightedSelect = (items, size, breakfastMenu) => {
+const weightedSelect = (items, category, size, breakfastMenu) => {
     // for if breakfast menu is in use, note using boolean on an attribute as this allows for reg menu ordering at breakfast time.
     if (breakfastMenu && category === "Sides") {
         if (size === "Small" || size === "Medium") {
