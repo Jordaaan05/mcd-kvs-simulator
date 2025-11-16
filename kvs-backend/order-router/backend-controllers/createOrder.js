@@ -2,7 +2,7 @@
     Module for putting orders into the DB without the use of HTTP
 */
 
-const { Order, Item } = require("../../database/database")  
+const { Order, Item } = require("../../models/database")  
 const { broadcastMessage } = require("../../modules/websocket")
 
 const createOrder = async (order) => {

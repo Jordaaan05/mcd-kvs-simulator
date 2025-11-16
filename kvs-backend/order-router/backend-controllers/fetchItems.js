@@ -2,7 +2,7 @@
     Fetch the required item information for the order router from the DB
 */
 
-const { Item, Category } = require('../../database/database')
+const { Item, Category } = require('../../models/database')
 
 const fetchItems = async () => {
     try {

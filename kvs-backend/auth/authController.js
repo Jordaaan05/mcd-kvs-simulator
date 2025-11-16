@@ -3,7 +3,7 @@
 */
 
 const jwt = require("jsonwebtoken")
-const { User, Store } = require("../database/database")
+const { User, Store } = require("../models/database")
 const bcrypt = require("bcrypt")
 const secretKey = process.env.SECRET_KEY || "correctHorseBatteryStaple" // PLEASE CONFIGURE THIS IN YOUR ENV FILE
 

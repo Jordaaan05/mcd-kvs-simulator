@@ -1,4 +1,4 @@
-const { Store } = require('../database/database')
+const { Store } = require('../models/database')
 const { broadcastMessage } = require('../modules/websocket')
 
 const getCurrentStoreInfo = async (req, res) => {

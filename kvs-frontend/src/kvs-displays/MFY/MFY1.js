@@ -135,7 +135,10 @@ function MFY1() {
     if (recallMode) {
       setRecalledOrder(prevIndex => (prevIndex < servedOrders.length - 1 ? prevIndex + 1 : servedOrders.length - 1));
     } else {
-      setActiveIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : orders.length - 1));
+      setActiveIndex(prevIndex => {
+        const displayLimit = columns * 2 - 1;
+        const maxIndex = Math.min(displayLimit, orders.length - 1);
+        return prevIndex > 0 ? prevIndex - 1 : maxIndex});
     }
   };
   
@@ -143,7 +146,10 @@ function MFY1() {
     if (recallMode) {
       setRecalledOrder(prevIndex => (prevIndex > 0 ? prevIndex - 1 : 0));
     } else {
-      setActiveIndex(prevIndex => (prevIndex < orders.length - 1 ? prevIndex + 1 : 0));
+      setActiveIndex(prevIndex => {
+        const displayLimit = columns * 2 - 1;
+        const maxIndex = Math.min(displayLimit, orders.length - 1);
+        return prevIndex < maxIndex ? prevIndex + 1 : 0});
     }
   };
   

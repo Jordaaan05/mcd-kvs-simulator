@@ -1,0 +1,5 @@
+- on day close all non served orders go bye bye
+- after 20 mins orders get served automatically
+- Set time/date for program, all times referenced from this on displays/in order generator
+- Order generator adjust volumes / factor in store size, improve sample data.
+- Fry KVS and DT KVS

@@ -1,4 +1,4 @@
-const { Order, Item, Category } = require('../database/database'); // Adjust the path as per your project structure
+const { Order, Item, Category } = require('../models/database'); // Adjust the path as per your project structure
 const { broadcastMessage } = require('../modules/websocket')
 const { Op } = require('sequelize')
 

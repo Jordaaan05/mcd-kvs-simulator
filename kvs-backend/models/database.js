@@ -158,8 +158,7 @@ const Stations = sequelize.define('Stations', {
   displayName: {
     type: DataTypes.STRING
   }
-}
-)
+})
 
 const Settings = sequelize.define('Settings', {
   /*

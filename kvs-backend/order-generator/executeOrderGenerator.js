@@ -3,7 +3,7 @@
 */
 
 // DB imports
-const { Settings, Category, Item, Store, CustomerCount } = require("../database/database")
+const { Settings, Category, Item, Store, CustomerCount } = require("../models/database")
 
 // Module imports
 const { generateOrder } = require("./generateOrder")

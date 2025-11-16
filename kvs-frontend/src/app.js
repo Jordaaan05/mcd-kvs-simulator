@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, useParams, useNavigate, Route, Routes } from 'react-router-dom';
 import MFY1 from './kvs-displays/MFY/MFY1';
 import MFY2 from './kvs-displays/MFY/MFY2';
 import MFY3 from './kvs-displays/MFY/MFY3';
@@ -11,6 +12,7 @@ import Cafe1 from './Cafe1';
 import Cafe2 from './Cafe2'; */
 import DRINKS1 from './kvs-displays/DRINKS/DRINKS1';
 import GRILL1 from './kvs-displays/GRILL/GRILL1';
+import GenericDisplay from './kvs-displays/display';
 import AdminPage from './Admin';
 import DayOpen from './dayopen';
 import Setup from './setup';
@@ -27,6 +29,23 @@ import { AuthProvider } from './authContext';
 import { ErrorProvider } from './modules/error-display/errorContext'
 import ErrorDisplay from './modules/error-display/errorDisplay'
 
+// Read URL and update activepage
+const UrlHandler = ({ setActivePage }) => {
+    const params = useParams();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (params.stationId) {
+             const page = params.stationId.toLowerCase();
+             setActivePage(page);
+
+             navigate('/', { replace: true });
+        }
+    }, [params.stationId, setActivePage, navigate]);
+
+    return null;
+}
+
 const App = () => {
     const [activePage, setActivePage] = useState('home');
     const [setupComplete, setSetupComplete] = useState(false);
@@ -42,41 +61,41 @@ const App = () => {
       const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
 
       ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if (message.type === 'STORE_INFO_UPDATED') {
-          setActivePage('day_open');
+          const message = JSON.parse(event.data);
+          if (message.type === 'STORE_INFO_UPDATED') {
+              setActivePage('day_open');
   
-          setTimeout(() => {
-            const savedOriginalPage = sessionStorage.getItem('originalPage');
-            setActivePage(savedOriginalPage || 'home');
-          }, 60000) // redirects to the day open page for 60 seconds.
-        }
+              setTimeout(() => {
+                const savedOriginalPage = sessionStorage.getItem('originalPage');
+                setActivePage(savedOriginalPage || 'home');
+              }, 60000) // redirects to the day open page for 60 seconds.
+          }
 
-        if (message.type === "SETUP-COMPLETE") {
-          setSetupComplete(true)
-        }
+          if (message.type === "SETUP-COMPLETE") {
+              setSetupComplete(true)
+          }
       }
 
       ws.onclose = () => {
-        console.log("WebSocket connection closed")
+          console.log("WebSocket connection closed")
       }
 
       return () => {
-        ws.close()
+          ws.close()
       }
     }, [activePage])
 
     useEffect(() => {
-      const initaliseSettings = async () => {
-        const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`)
-        const data = response.data
-        for (let setting of data) {
-          if (setting.name === "Setup-Complete") {
-            setSetupComplete(true)
-          }
+        const initaliseSettings = async () => {
+            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`)
+            const data = response.data
+            for (let setting of data) {
+                if (setting.name === "Setup-Complete") {
+                    setSetupComplete(true)
+                }
+            }
         }
-      }
-      initaliseSettings()
+        initaliseSettings()
     })
 
     const renderPage = () => {
@@ -88,7 +107,8 @@ const App = () => {
         case 'mfy3':
           return <MFY3 />;
         case 'mfy4':
-          return <MFY4 />;
+          //return <MFY4 />;
+          return <GenericDisplay stationName={activePage.toUpperCase()} />
         case 'fc1':
           return <FC1 />;
         case 'fc2':
@@ -96,7 +116,8 @@ const App = () => {
         case 'drinks1':
           return <DRINKS1 />
         case 'grill1':
-          return <GRILL1 />
+          //return <GRILL1 />
+          return <GenericDisplay stationName={activePage.toUpperCase()} />
         case 'admin':
           return <AdminPage />;
         case 'day_open':
@@ -127,13 +148,19 @@ const App = () => {
   
     return (
       <AuthProvider>
-      <ErrorProvider>
-        <ErrorDisplay currentPage={activePage} />
-        <div className="App">
-          {renderPage()}
-        </div>
-      </ErrorProvider>
-    </AuthProvider>
+          <ErrorProvider>
+              <ErrorDisplay currentPage={activePage} />
+              <Router>
+                  <UrlHandler setActivePage={setActivePage} />
+                  <Routes>
+                      <Route path="/admin" element={<AdminPage />} />
+                  </Routes>
+                  <div className="App">
+                      {renderPage()}
+                  </div>
+              </Router>
+          </ErrorProvider>
+      </AuthProvider>
     );
   };
 

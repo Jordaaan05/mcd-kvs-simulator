@@ -1,0 +1,58 @@
+export const displays = {
+    MFY1: {
+        id: 'MFY1',
+        stationName: 'MFY1',
+        columns: 2,
+        itemsPerCard: 12
+    },
+
+    MFY4: {
+        stationName: 'MFY4',
+        columns: 2,
+        itemsPerCard: 12,
+        showmfy: false,
+        orangeTime: 30,
+        redTime: 60,
+        transformItems: (items, ctx) => {
+            return items
+                .filter(item => 
+                    item.Categories.some(c => 
+                        c.name === "Beef" || c.name === "Chicken" || c.name === "Breakfast"
+                    )
+                )
+                .sort((a, b) => {
+                    const ca = a.Categories.find(c => 
+                        c.name === "Beef" || c.name === "Chicken" || c.name === "Breakfast"
+                    );
+                    const cb = b.Categories.find(c => 
+                        c.name === "Beef" || c.name === "Chicken" || c.name === "Breakfast"
+                    );
+
+                    if (ca.sortID !== cb.sortID) return ca.sortID - cb.sortID;
+                    return a.ID - b.ID;
+                });
+        }
+    },
+
+    GRILL1: {
+        stationName: 'GRILL1',
+        columns: 3,
+        itemsPerCard: 12,
+        showmfy: false,
+        orangeTime: 30,
+        redTime: 60,
+        transformItems: (items, ctx) => {
+            return items
+                .filter(item => 
+                    item.Categories.some(c => c.name === "Beef")
+                )
+                .sort((a, b) => {
+                    const ca = a.Categories.find(c => c.name === "Beef");
+                    const cb = b.Categories.find(c => c.name === "Beef");
+
+                    if (ca.sortID !== cb.sortID) return ca.sortID - cb.sortID;
+                    return a.ID - b.ID;
+                });
+        }
+    },
+}

@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config()
 
 const bodyParser = require('body-parser');
-const { sequelize } = require('./database/database');
+const { sequelize } = require('./models/database');
 const ordersRouter = require('./routes/orders');
 const optionsRouter = require('./routes/options')
 const categoriesRouter = require('./routes/categories')
