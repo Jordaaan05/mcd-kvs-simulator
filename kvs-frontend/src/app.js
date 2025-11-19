@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, useParams, useNavigate, Route, Routes } from 'react-router-dom';
-import MFY1 from './kvs-displays/MFY/MFY1';
-import MFY2 from './kvs-displays/MFY/MFY2';
-import MFY3 from './kvs-displays/MFY/MFY3';
-import MFY4 from './kvs-displays/MFY/MFY4';
-import FC1 from './kvs-displays/FC/FC1';
-import FC2 from './kvs-displays/FC/FC2';
-/*import DT from './DT';
-import DTPark from './DTPark';
-import Cafe1 from './Cafe1';
-import Cafe2 from './Cafe2'; */
-import DRINKS1 from './kvs-displays/DRINKS/DRINKS1';
-import GRILL1 from './kvs-displays/GRILL/GRILL1';
 import GenericDisplay from './kvs-displays/display';
 import AdminPage from './Admin';
 import DayOpen from './dayopen';
@@ -22,6 +10,7 @@ import DashSignup from './dashboard/dash-signup';
 import DashHome from './dashboard/dashhome';
 import DashStations from './dashboard/modify/dash-stations'
 import DashManager from './dashboard/dash-manager';
+import DashItems from './dashboard/modify/dash-items';
 import axios from 'axios';
 import './css/App.css';
 
@@ -100,42 +89,29 @@ const App = () => {
 
     const renderPage = () => {
       switch (activePage) {
-        case 'mfy1':
-          return <MFY1 />;
-        case 'mfy2':
-          return <MFY2 />;
-        case 'mfy3':
-          return <MFY3 />;
-        case 'mfy4':
-          //return <MFY4 />;
-          return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'fc1':
-          return <FC1 />;
-        case 'fc2':
-          return <FC2 />;
-        case 'drinks1':
-          return <DRINKS1 />
-        case 'grill1':
-          //return <GRILL1 />
-          return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'admin':
-          return <AdminPage />;
-        case 'day_open':
-          return <DayOpen />
-        case 'setup':
-          return <Setup handlePageChange={handlePageChange}/>
-        case 'settings':
-          return <Settings handlePageChange={handlePageChange} activePage={activePage}/>
-        case 'login':
-          return <DashLogin handlePageChange={handlePageChange}/>
-        case 'signup':
-          return <DashSignup handlePageChange={handlePageChange}/>
-        case 'dashhome':
-          return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
-        case 'dashstations':
-          return <DashStations handlePageChange={handlePageChange} activePage={activePage}/>
-        case 'dashmanager':
-          return <DashManager handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'mfy1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'mfy2': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'mfy3': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'mfy4': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'fc1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'fc2': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'drinks1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'grill1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'cafe1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'cafe2': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'dt1': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'dt2': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'dt3': return <GenericDisplay stationName={activePage.toUpperCase()} />
+        case 'admin': return <AdminPage />;
+        case 'day_open': return <DayOpen />
+        case 'setup': return <Setup handlePageChange={handlePageChange}/>
+        case 'settings': return <Settings handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'login': return <DashLogin handlePageChange={handlePageChange}/>
+        case 'signup': return <DashSignup handlePageChange={handlePageChange}/>
+        case 'dashhome': return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'dashstations': return <DashStations handlePageChange={handlePageChange} activePage={activePage}/>
+        case 'dashitems': return <DashItems handlePageChange={handlePageChange} activePage={activePage} />
+        case 'dashmanager': return <DashManager handlePageChange={handlePageChange} activePage={activePage}/>
         default:
           if (setupComplete){
             return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
@@ -165,19 +141,3 @@ const App = () => {
   };
 
 export default App;
-
-
-/* Rest of the cases: 
-        
-        
-        
-       
-        case 'dt':
-          return <DT />;
-        case 'dtpark':
-          return <DTPark />;
-        case 'cafe1':
-          return <Cafe1 />;
-        case 'cafe2':
-          return <Cafe2 />;
-*/

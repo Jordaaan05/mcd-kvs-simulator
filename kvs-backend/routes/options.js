@@ -6,6 +6,8 @@ router.get('/', optionsController.getAllOptions)
 
 router.post('/', optionsController.createOption)
 
+router.put('/:id', optionsController.modifyOption)
+
 router.delete('/:id', optionsController.deleteOption)
 
 module.exports = router

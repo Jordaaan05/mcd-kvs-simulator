@@ -1,4 +1,4 @@
-const { Order, Item, Category } = require('../models/database')
+const { Item, Category } = require('../models/database')
 
 const getAllOptions = async (req, res) => {
     try {
@@ -51,8 +51,45 @@ const deleteOption = async (req, res) => {
     }
 }
 
+const modifyOption = async (req, res) => {
+    const { id } = req.params;
+    const { name, price, display, category } = req.body;
+
+    try {
+        const option = await Item.findByPk(id);
+
+        if (!option) {
+            return res.status(404).json({ error: "Option not found" })
+        }
+
+        option.name = name;
+        option.price = price;
+        option.display = display;
+
+        await option.save();
+
+        if (typeof category !== 'undefined') {
+            const dbCategory = await Category.findOne({ where: { name: category }});
+            if (dbCategory) {
+                if (typeof option.setCategories === 'function') {
+                    await option.setCategories([dbCategory]);
+                } else if (typeof option.setCategory === 'function') {
+                    await option.setCategory(dbCategory);
+                }
+            };
+        };
+
+        const optionWithCategory = await Option.findByPk(option.id, { include: Category });
+        res.json(optionWithCategory || option);
+    } catch (err) {
+        console.error("Error updating Option:", err);
+        res.status(400).json({ error: "Error updating option" });
+    }
+}
+
 module.exports = {
     getAllOptions,
     createOption,
-    deleteOption
+    deleteOption,
+    modifyOption
 }
