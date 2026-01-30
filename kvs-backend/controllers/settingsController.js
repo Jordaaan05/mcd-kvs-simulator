@@ -1,5 +1,5 @@
 const { Settings } = require("../models/database")
-const { broadcastToRestaurant } = require('../modules/websocket')
+const { broadcastToRestaurant } = require('../modules/broadcaster')
 
 const getAllSettings = async (req, res) => {
     const StoreId = req.user.storeId;

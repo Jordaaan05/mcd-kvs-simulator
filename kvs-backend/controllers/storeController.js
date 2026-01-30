@@ -1,5 +1,5 @@
 const { Store } = require('../models/database')
-const { broadcastToRestaurant } = require('../modules/websocket')
+const { broadcastToRestaurant } = require('../modules/broadcaster')
 
 const getCurrentStoreInfo = async (req, res) => {
     try {

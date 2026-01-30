@@ -1,8 +1,9 @@
 // websocket.js
 const WebSocket = require('ws')
 
-const simulationRegistry = require("../simulation/simulationRegistry")
-const { Store, Stations } = require("../models/database")
+const simulationRegistry = require("../simulation/simulationRegistry");
+const { Store, Stations } = require("../models/database");
+const { addClientToRoom, removeClientFromRoom } = require("./broadcaster");
 
 let wss;
 
@@ -26,7 +27,7 @@ const initialiseWebSocket = (server) => {
                         rooms.set(storeId, new Set());
                     }
 
-                    rooms.get(storeId).add(ws);
+                    addClientToRoom(storeId, ws)
                     ws.storeId = storeId;
                     ws.kvsNum = kvsNum;
 
@@ -73,13 +74,9 @@ const initialiseWebSocket = (server) => {
         });
 
         ws.on("close", () => {
-            if (ws.storeId && rooms.has(ws.storeId)) {
-                rooms.get(ws.storeId).delete(ws);
-                if (rooms.get(ws.storeId).size === 0) {
-                    rooms.delete(ws.storeId);
-                }
-
-                if (ws.kvsNum !== "APP") {
+            if (ws.storeId) {
+                const isEmpty = removeClientFromRoom(ws.storeId, ws)
+                if (ws.kvsNum !== "APP" && isEmpty) {
                     const sim = simulationRegistry.get(ws.storeId);
                     sim?.onClientDisconnected();    
                 }
@@ -90,18 +87,6 @@ const initialiseWebSocket = (server) => {
     
 }
 
-const broadcastToRestaurant = (storeId, message) => {
-    const clients = rooms.get(storeId);
-    if (!clients) return;
-
-    for (const ws of clients) {
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify(message));
-        }
-    }
-}
-
 module.exports = {
-    initialiseWebSocket,
-    broadcastToRestaurant
+    initialiseWebSocket
 }

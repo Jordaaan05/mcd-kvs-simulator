@@ -1,5 +1,5 @@
 const { Order, Item, Category } = require('../models/database'); // Adjust the path as per your project structure
-const { broadcastToRestaurant } = require('../modules/websocket')
+const { broadcastToRestaurant } = require('../modules/broadcaster')
 const { Op } = require('sequelize')
 
 /*
