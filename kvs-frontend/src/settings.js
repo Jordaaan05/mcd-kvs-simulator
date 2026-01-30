@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import fetchSettings from "./modules/fetch/fetchSettings";
-import axios from "axios";
+import api from "./modules/api";
 import './css/Setup.css'
 
 import DashNav from "./dashboard/dash-nav";
@@ -34,7 +34,7 @@ function Settings({ handlePageChange, activePage }) {
         )
 
         setSettings(updatedSettings)
-        await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings/${id}`, { value })
+        await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings/${id}`, { value })
     }
     
     const settingNameMapping = {

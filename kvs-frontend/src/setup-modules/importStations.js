@@ -2,7 +2,7 @@
     Import the stations from file into the database
 */
 import { kvsDisplays } from "../default_store/kvsDisplays"
-import axios from "axios"
+import api from "../modules/api"
 import fetchStations from "../order-router/fetch-modules/fetchStations"
 
 const importStations = async () => {
@@ -15,7 +15,7 @@ const importStations = async () => {
 
       const stationExists = stations.find(station => station.name === kvsDisplay.name)
       if (!stationExists) {
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`, {
+        await api.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`, {
           name: kvsDisplay.name,
           group: kvsDisplay.group,
           displayName: kvsDisplay.displayName,

@@ -3,11 +3,11 @@
 */
 
 const { Order, Item } = require("../../models/database")  
-const { broadcastMessage } = require("../../modules/websocket")
+const { broadcastToRestaurant } = require("../../modules/websocket")
 
 const createOrder = async (order) => {
-    const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut, businessDay } = order
-  
+    const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut, businessDay, StoreId } = order
+    
     try {
       const newOrder = await Order.create({
         orderNumber,
@@ -16,6 +16,7 @@ const createOrder = async (order) => {
         mfySide,
         timestamp,
         FCSide,
+        StoreId: StoreId,
         sendToKVS: kvsToSendTo,
         registerNumber: registerNumber,
         orderLocation: orderLocation,
@@ -41,7 +42,7 @@ const createOrder = async (order) => {
       });
       await Promise.all(itemPromises)
   
-      broadcastMessage({ type: "NEW_ORDER", data: [newOrder.id, kvsToSendTo] })
+      broadcastToRestaurant(StoreId, { type: "NEW_ORDER", data: [newOrder.id, kvsToSendTo] });
     } catch (err) {
       console.error('Error creating order:', err);
     }

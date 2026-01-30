@@ -2,26 +2,28 @@
     Manager Dashboard login page.
 */
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useAuth } from "../authContext"
 import { useError } from "../modules/error-display/errorContext"
+import api from "../modules/api"
 
-function DashLogin({ handlePageChange }) {
-    const { login } = useAuth()
+function DashLogin({ handlePageChange, fetchSetupStatus }) {
+    const { login, isAuthenticated } = useAuth()
     const { addError } = useError()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    const { isAuthenticated } = useAuth()
-    if (isAuthenticated()) {
-        handlePageChange('home')
-    }
+    useEffect(() => {
+        if (isAuthenticated()) {
+            fetchSetupStatus();
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             await login(username, password);
-            handlePageChange('dashhome')
+            await fetchSetupStatus();
         } catch (error) {
             addError("Incorrect Username or Password")
             console.error('Login failed:', error);

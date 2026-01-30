@@ -47,7 +47,7 @@ const simulate15MinInterval = async (intervalStart, sampleData) => {
       
         console.log("Order Scheduler running for interval starting:", `${intervalStart.toLocaleString("en-GB")}`, "\nVolumes:\n   Front:", frontCounterCount, "\n   Drive:", driveThruCount);
       
-        await storeCustomerCount(intervalStart, intervalEnd, frontCounterCount, driveThruCount);
+        //await storeCustomerCount(intervalStart, intervalEnd, frontCounterCount, driveThruCount); awaiting store id.
       
         const scheduleOrders = async (count, type) => {
             const timeRange = 15 * 60 * 1000;
@@ -83,9 +83,9 @@ const executeOrderGenerator = async (customerLocation) => {
     let currentSettings = currentSettingsRaw.map(setting => setting.dataValues)
     let currentItems = await Item.findAll({ include: Category })
     let currentStore = await Store.findOne({ order: [['createdAt', 'DESC']] })
-    if (currentSettings.find(setting => setting.name === "Generator-Enabled").value === "On") {
+    /*if (currentSettings.find(setting => setting.name === "Generator-Enabled").value === "On") {
         generateOrder(currentSettings, currentItems, currentStore.currentBusinessDay, customerLocation)
-    }
+    }*/
 }
 
 module.exports = { simulate15MinInterval }

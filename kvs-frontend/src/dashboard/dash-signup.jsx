@@ -2,25 +2,26 @@
     Manager Dashboard Signup page.
 */
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useAuth } from "../authContext"
 
-function DashSignup({ handlePageChange }) {
-    const { register } = useAuth()
-    const [newUsername, setNewUsername] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [newStoreName, setNewStoreName] = useState('')
+function DashSignup({ handlePageChange, fetchSetupStatus }) {
+    const { register, isAuthenticated } = useAuth();
+    const [newUsername, setNewUsername] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [newStoreName, setNewStoreName] = useState('');
 
-    const { isAuthenticated } = useAuth()
-    if (isAuthenticated()) {
-        handlePageChange('home')
-    }
+    useEffect(() => {
+        if (isAuthenticated()) {
+            fetchSetupStatus();
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             await register(newUsername, newPassword, 'user' ,newStoreName) // user is the role TEMP
-            handlePageChange('dashhome')
+            await fetchSetupStatus()
         } catch (error) {
             console.error('Registration failed:', error)
         }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../modules/api';
 import DashNav from '../dash-nav';
 import '../../css/dashboard.css'
 
@@ -14,6 +14,8 @@ function DashItems({ handlePageChange, activePage }) {
     const [saving, setSaving] = useState({}); // per row save state
     const [newItem, setNewItem] = useState(null);
     const [errors, setErrors] = useState({}); // { itemId: { field: msg } }
+    const [sortBy, setSortBy] = useState('category');
+    const [sortDir, setSortDir] = useState('asc');
 
     useEffect(() => {
         const load = async () => {
@@ -26,11 +28,11 @@ function DashItems({ handlePageChange, activePage }) {
                             return await fetchItems(); // if this returns items with categories already, great
                         } catch (e) {
                             // fallback to direct call if fetchItems is not available / fails
-                            const r = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`);
+                            const r = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`);
                             return r.data;
                         }
                     })(),
-                    axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`)
+                    api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`)
                 ]);
 
                 const fetchedCats = Array.isArray(catsRes.data) ? catsRes.data : [];
@@ -149,7 +151,7 @@ function DashItems({ handlePageChange, activePage }) {
     // helper to fetch authoritative single item (including categories)
     const fetchSingleOption = async (itemId) => {
         try {
-            const r = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options/${itemId}`);
+            const r = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options/${itemId}`);
             const it = r.data;
             let categoriesArray = [];
             if (Array.isArray(it.categories) && it.categories.length) categoriesArray = it.categories;
@@ -182,7 +184,9 @@ function DashItems({ handlePageChange, activePage }) {
                 category: candidate.category
             };
 
-            await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options/${itemId}`, payload);
+            console.log("Modifying....")
+            await api.put(`/options/${itemId}`, payload);
+            console.log("Done!")
 
             // after PUT, fetch authoritative item with categories and update list so UI shows assigned category immediately
             const authoritative = await fetchSingleOption(itemId);
@@ -227,7 +231,7 @@ function DashItems({ handlePageChange, activePage }) {
                 display: newItem.display,
                 category: newItem.category
             }
-            const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, payload);
+            const response = await api.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, payload);
             const created = response.data;
             
             let createdCategories = [];
@@ -275,6 +279,15 @@ function DashItems({ handlePageChange, activePage }) {
         });
     };
 
+    const toggleSort = (column) => {
+        if (sortBy === column) {
+            setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortDir('asc');
+        }
+    }
+
     const renderCell = (item, field, displayValue) => {
         const id = item.id;
         const isEditing = editing[id] && editing[id].hasOwnProperty(field);
@@ -316,17 +329,20 @@ function DashItems({ handlePageChange, activePage }) {
     };
 
     const sortedItems = [...items].sort((a, b) => {
+        if (sortBy === 'id') {
+            return sortDir === 'asc' ? (a.id - b.id) : (b.id - a.id);
+        }        
         const ca = (a.category || '').toLowerCase()
         const cb = (b.category || '').toLowerCase()
-        if (ca < cb) return -1
-        if (ca > cb) return 1
-        // if category equal, sort by display then name
-        const da = (a.id)
-        const db = (b.id)
-        if (da < db) return -1
-        if (da > db) return 1
-        return 0
-    })
+        if (ca < cb) return sortDir === 'asc' ? -1 : 1
+        if (ca > cb) return sortDir === 'asc' ? 1 : -1
+        return a.id - b.id
+    });
+
+    const sortIndicator = (column) => {
+        if (sortBy !== column) return '';
+        return sortDir === 'asc' ? ' ▲' : ' ▼';
+    }
 
     return (
         <div className='dashboard items'>
@@ -338,8 +354,8 @@ function DashItems({ handlePageChange, activePage }) {
                 <table className='table' style={{ backgroundColor: '#f8f9fa', border: '2px solid', width: '100%', tableLayout: 'fixed' }}>
                     <thead>
                         <tr>
-                            <th style={{ width: 80 }}>ID</th>
-                            <th>Category</th>
+                            <th style={{ width: 80, cursor: 'pointer' }} onClick={() => toggleSort('id')}>ID{sortIndicator('id')}</th>
+                            <th style={{ cursor: 'pointer'}} onClick={() => toggleSort('category')}>Category{sortIndicator('category')}</th>
                             <th>Display (max 20)</th>
                             <th>Name (max 50)</th>
                             <th>Price</th>
@@ -376,7 +392,7 @@ function DashItems({ handlePageChange, activePage }) {
                                                 <button className='btn btn-sm btn-outline-danger' onClick={async () => {
                                                     if (!window.confirm('Delete this option?')) return
                                                     try {
-                                                        await axios.delete(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options/${item.id}`)
+                                                        await api.delete(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options/${item.id}`)
                                                         setItems(prev => prev.filter(it => it.id !== item.id))
                                                     } catch (e) {
                                                         console.error('Delete failed', e)

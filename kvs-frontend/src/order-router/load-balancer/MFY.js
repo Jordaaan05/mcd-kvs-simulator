@@ -17,7 +17,7 @@ const mfyRouter = async (stations) => {
     if (numActiveMfySides === 1) {
         return activeMfySides[0].name;
     } else if (numActiveMfySides === 2) {
-        // two sides running, load balancing applies.
+        // two sides running, load balancing applies (send to side with less orders).
         const sideA = activeMfySides[0].name;
         const sideB = activeMfySides[1].name;
 
@@ -35,6 +35,7 @@ const mfyRouter = async (stations) => {
             return sideA;
         }
     } else if (numActiveMfySides >= 3) {
+        // three or more sides running, use round robin rules
         return roundRobinAssign(activeMfySides)
     }
 }

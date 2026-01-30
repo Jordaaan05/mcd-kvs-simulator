@@ -1,9 +1,10 @@
 const { Settings } = require("../models/database")
-const { broadcastMessage } = require('../modules/websocket')
+const { broadcastToRestaurant } = require('../modules/websocket')
 
 const getAllSettings = async (req, res) => {
+    const StoreId = req.user.storeId;
     try {
-        const settings = await Settings.findAll()
+        const settings = await Settings.findAll({ where: { StoreId } })
         res.json(settings)
     } catch (err) {
         console.error('Error fetching settings:', err)
@@ -12,16 +13,18 @@ const getAllSettings = async (req, res) => {
 }
 
 const createSetting = async (req, res) => {
-    const { name, value } = req.body
+    const StoreId = req.user.storeId;
+    const { name, value } = req.body;
 
     if (name == "Setup-Complete") {
-        broadcastMessage({ type: "SETUP-COMPLETE", data: "TRUE"})
+        broadcastToRestaurant(StoreId, { type: "SETUP-COMPLETE", data: "TRUE"})
     }
 
     try {
         const newSetting = await Settings.create({
             name: name,
-            value: value
+            value: value,
+            StoreId
         })
         res.status(201).json(newSetting)
     } catch (err) {
@@ -31,11 +34,17 @@ const createSetting = async (req, res) => {
 }
 
 const updateSettingFromID = async (req, res) => {
-    const { id } = req.params
-    const { value } = req.body
+    const { id } = req.params;
+    const { value } = req.body;
+    const StoreId = req.user.storeId;
 
     try {
-        const setting = await Settings.findByPk(id)
+        const setting = await Settings.findOne({
+            where: {
+                id,
+                StoreId
+            }
+        });
 
         if (!setting) {
             return res.status(404).json({ error: 'Setting not found' })
@@ -52,11 +61,12 @@ const updateSettingFromID = async (req, res) => {
 }
 
 const updateSettingFromName = async (req, res) => {
-    const { name } = req.params
-    const { value } = req.body
+    const { name } = req.params;
+    const { value } = req.body;
+    const StoreId = req.user.storeId;
 
     try {
-        const setting = await Settings.findOne({ name: name })
+        const setting = await Settings.findOne({ name: name, StoreId });
 
         if (!setting) {
             return res.status(404).json({ error: 'Setting not found' })

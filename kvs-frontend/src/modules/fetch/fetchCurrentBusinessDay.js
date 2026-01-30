@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api";
 import { jwtDecode } from "jwt-decode"
 
 const fetchCurrentBusinessDay = async () => {
@@ -9,7 +9,7 @@ const fetchCurrentBusinessDay = async () => {
         const decoded = jwtDecode(token)
         const storeId = decoded.storeId
 
-        const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/${storeId}`);
+        const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/${storeId}`);
         const currentBusinessDay = response.data.currentBusinessDay
         return currentBusinessDay;
     } catch (error) {

@@ -8,7 +8,7 @@ import axios from 'axios'
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children })=> {
-    const [token, setToken] = useState(null)
+    const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem('token')
@@ -24,9 +24,10 @@ export const AuthProvider = ({ children })=> {
             console.log('created user')
 
             const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/api/auth/login`, { username, password })
-            const { token } = response.data
+            const { token, storeId } = response.data
             setToken(token)
             sessionStorage.setItem('token', token)
+            sessionStorage.setItem('storeId', storeId)
         } catch (error) {
             throw new Error('Signup failed');
         }
@@ -35,9 +36,10 @@ export const AuthProvider = ({ children })=> {
     const login = async (username, password) => {
         try {
             const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/api/auth/login`, { username, password })
-            const { token } = response.data;
+            const { token, storeId } = response.data;
             setToken(token);
             sessionStorage.setItem('token', token);
+            sessionStorage.setItem('storeId', storeId);
         } catch (error) {
             throw new Error('Login failed');
         }

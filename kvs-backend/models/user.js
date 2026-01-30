@@ -2,10 +2,9 @@
   Database module for the User table
 */
 
-const { DataTypes } = require('sequelize'); // Import DataTypes
 const bcrypt = require('bcrypt');
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     id: {
       type: DataTypes.INTEGER,
@@ -29,6 +28,11 @@ module.exports = (sequelize) => {
       beforeCreate: async (user) => {
         if (user.password) {
           user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+      beforeUpdate: async (user) => {
+        if (user.changed("password")) {
+            user.password = await bcrypt.hash(user.password, 10);
         }
       }
     }

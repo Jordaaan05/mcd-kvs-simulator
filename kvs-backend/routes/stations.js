@@ -2,12 +2,14 @@ const express = require('express')
 const router = express.Router()
 const stationController = require('../controllers/stationController')
 
-router.get('/', stationController.getAllStations)
+const { authenticateToken } = require("../auth/authController")
 
-router.get('/name/:name', stationController.getStationByName)
+router.get('/', authenticateToken, stationController.getAllStations)
 
-router.post('/', stationController.createStation)
+router.get('/name/:name', authenticateToken, stationController.getStationByName)
 
-router.put('/:id', stationController.updateStationStatus)
+router.post('/', authenticateToken, stationController.createStation)
+
+router.put('/:id', authenticateToken, stationController.updateStationStatus)
 
 module.exports = router

@@ -22,7 +22,7 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid username or password' })
         }
 
-        const store = await Store.findOne({ where: { userId: user.id } })
+        const store = await Store.findOne({ where: { UserId: user.id } })
 
         const token = jwt.sign(
             { 
@@ -35,7 +35,11 @@ const login = async (req, res) => {
             { expiresIn: '1h' }
         )
 
-        res.json({ token })
+        res.json({ 
+            token,
+            userId: user.id,
+            storeId: store ? store.id : null,
+        })
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' })
     }
@@ -46,7 +50,7 @@ const register = async (req, res) => {
     try {
         const existingUser = await User.findOne({ where: { username } })
         if (existingUser) {
-            await res.status(400).json({ message: 'Username already exists' })
+            return res.status(400).json({ message: 'Username already exists' })
         }
 
         const newUser = await User.create({ 
@@ -57,10 +61,14 @@ const register = async (req, res) => {
 
         const newStore = await Store.create({
             name: storeName || `${username}'s Store`,
-            userId: newUser.id,
+            UserId: newUser.id,
         })
-        return res.status(200).json({ message: 'Successfully created user/store:', username, storeName})
+        return res.status(200).json({ 
+            userId: newUser.id,
+            storeId: newStore.id
+        })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: 'Internal server error' });
     }
 }
@@ -69,7 +77,7 @@ const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
-    if (!token) return res.sendStatus(401);
+    if (!token) return res.status(401).json({ message: 'Invalid token'});
 
     jwt.verify(token, secretKey, (err, user) => {
         if (err) return res.sendStatus(403)

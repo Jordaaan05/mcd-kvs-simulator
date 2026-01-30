@@ -36,22 +36,6 @@ sequelize.authenticate()
   .then(() => {
     console.log('Database connected');
 
-    const sampleData = loadSampleData()
-    simulate15MinInterval(new Date(), sampleData)
-
-    const now = new Date()
-    const msToNextQuarter = (15 - (now.getMinutes() % 15)) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds()
-
-    setTimeout(() => {
-      const sampleData = loadSampleData()
-      simulate15MinInterval(new Date(), sampleData)
-
-      setInterval(() => {
-        const sampleData = loadSampleData()
-        simulate15MinInterval(new Date(), sampleData)
-      }, 15*60*1000)
-    }, msToNextQuarter)
-
     const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

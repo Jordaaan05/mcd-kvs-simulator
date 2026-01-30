@@ -1,5 +1,5 @@
 const { Store } = require('../models/database')
-const { broadcastMessage } = require('../modules/websocket')
+const { broadcastToRestaurant } = require('../modules/websocket')
 
 const getCurrentStoreInfo = async (req, res) => {
     try {
@@ -19,7 +19,7 @@ const insertCurrentStoreInfo = async (req, res) => {
             currentBusinessDay: businessDate
         });
 
-        broadcastMessage({ type: "STORE_INFO_UPDATED", data: newStoreInfo });
+        broadcastToRestaurant({ type: "STORE_INFO_UPDATED", data: newStoreInfo });
 
         res.status(201).json(newStoreInfo)
     } catch (err) {
@@ -47,7 +47,7 @@ const updateBusinessDay = async (req, res) => {
     try {
         await Store.update({ currentBusinessDay: businessDate }, { where: { id: storeId } })
 
-        broadcastMessage({ type: "STORE_INFO_UPDATED", data: businessDate })
+        broadcastToRestaurant({ type: "STORE_INFO_UPDATED", data: businessDate })
     } catch (err) {
         console.error('Error updating business day:', err);
     }

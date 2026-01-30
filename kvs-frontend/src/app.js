@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, useParams, useNavigate, Route, Routes } from 'react-router-dom';
 import GenericDisplay from './kvs-displays/display';
-import AdminPage from './Admin';
 import DayOpen from './dayopen';
 import Setup from './setup';
 import Settings from './settings';
@@ -11,12 +10,12 @@ import DashHome from './dashboard/dashhome';
 import DashStations from './dashboard/modify/dash-stations'
 import DashManager from './dashboard/dash-manager';
 import DashItems from './dashboard/modify/dash-items';
-import axios from 'axios';
 import './css/App.css';
 
-import { AuthProvider } from './authContext'; 
+import { useAuth } from './authContext'; 
 import { ErrorProvider } from './modules/error-display/errorContext'
 import ErrorDisplay from './modules/error-display/errorDisplay'
+import api from "./modules/api"
 
 // Read URL and update activepage
 const UrlHandler = ({ setActivePage }) => {
@@ -25,10 +24,10 @@ const UrlHandler = ({ setActivePage }) => {
 
     useEffect(() => {
         if (params.stationId) {
-             const page = params.stationId.toLowerCase();
-             setActivePage(page);
+            const page = params.stationId.toLowerCase();
+            setActivePage(page);
 
-             navigate('/', { replace: true });
+            navigate('/', { replace: true });
         }
     }, [params.stationId, setActivePage, navigate]);
 
@@ -38,6 +37,7 @@ const UrlHandler = ({ setActivePage }) => {
 const App = () => {
     const [activePage, setActivePage] = useState('home');
     const [setupComplete, setSetupComplete] = useState(false);
+    const { isAuthenticated } = useAuth();
 
     // when the active page is not home, the order generator should be active if it is toggled on.
 
@@ -46,97 +46,125 @@ const App = () => {
       setActivePage(page);
     };
 
+    const fetchSetupStatus = async () => {
+        try {
+            const response = await api.get("/settings");
+            const setup = response.data.find(s => s.name === "Setup-Complete")?.value === "true";
+            setSetupComplete(setup)
+            handlePageChange(setup ? 'dashhome' : 'setup');
+        } catch (err) {
+            console.warn("Failed to fetch settings", err);
+            handlePageChange('setup')
+        }
+    }
+
     useEffect(() => {
-      const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
+        if (isAuthenticated()) {
+            fetchSetupStatus();
+        } else { 
+            handlePageChange('login');
+        }
+    }, [])
 
-      ws.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          if (message.type === 'STORE_INFO_UPDATED') {
-              setActivePage('day_open');
-  
-              setTimeout(() => {
-                const savedOriginalPage = sessionStorage.getItem('originalPage');
-                setActivePage(savedOriginalPage || 'home');
-              }, 60000) // redirects to the day open page for 60 seconds.
-          }
+    useEffect(() => {
+        const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`)
 
-          if (message.type === "SETUP-COMPLETE") {
-              setSetupComplete(true)
-          }
-      }
+        ws.onopen = () => {
+            ws.send(JSON.stringify({
+                type: "JOIN",
+                storeId: sessionStorage.getItem("storeId"),
+                kvsNum: "APP"
+            }))
+        }
 
-      ws.onclose = () => {
-          console.log("WebSocket connection closed")
-      }
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.type === 'STORE_INFO_UPDATED') {
+                setActivePage('day_open');
+    
+                setTimeout(() => {
+                    const savedOriginalPage = sessionStorage.getItem('originalPage');
+                    setActivePage(savedOriginalPage || 'dashhome');
+                }, 60000) // redirects to the day open page for 60 seconds.
+            }
 
-      return () => {
-          ws.close()
-      }
+            if (message.type === "SETUP-COMPLETE") {
+                setSetupComplete(true)
+            }
+        }
+
+        return () => ws.close();
     }, [activePage])
 
     useEffect(() => {
+        if (!isAuthenticated()) {
+            setActivePage('login');
+            return;
+        };
+
         const initaliseSettings = async () => {
-            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`)
-            const data = response.data
-            for (let setting of data) {
-                if (setting.name === "Setup-Complete") {
-                    setSetupComplete(true)
+            try { 
+                const response = await api.get("/settings");
+                const data = response.data
+                for (let setting of data) {
+                    if (setting.name === "Setup-Complete") {
+                        setSetupComplete(true)
+                    }
                 }
+            } catch (err) {
+                console.error("Failed to load settings", err)
             }
         }
         initaliseSettings()
-    })
+    }, [])
 
     const renderPage = () => {
       switch (activePage) {
-        case 'mfy1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'mfy2': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'mfy3': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'mfy4': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'fc1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'fc2': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'drinks1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'grill1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'cafe1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'cafe2': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'dt1': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'dt2': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'dt3': return <GenericDisplay stationName={activePage.toUpperCase()} />
-        case 'admin': return <AdminPage />;
+        case 'mfy1':
+        case 'mfy2':
+        case 'mfy3':
+        case 'mfy4':
+        case 'fc1':
+        case 'fc2':
+        case 'drinks1':
+        case 'grill1': 
+        case 'cafe1':
+        case 'cafe2': 
+        case 'dt1':
+        case 'dt2':
+        case 'dt3': 
+            return <GenericDisplay stationName={activePage.toUpperCase()} />
+
         case 'day_open': return <DayOpen />
         case 'setup': return <Setup handlePageChange={handlePageChange}/>
         case 'settings': return <Settings handlePageChange={handlePageChange} activePage={activePage}/>
-        case 'login': return <DashLogin handlePageChange={handlePageChange}/>
-        case 'signup': return <DashSignup handlePageChange={handlePageChange}/>
+        case 'login': return <DashLogin handlePageChange={handlePageChange} fetchSetupStatus={fetchSetupStatus}/>
+        case 'signup': return <DashSignup handlePageChange={handlePageChange} fetchSetupStatus={fetchSetupStatus}/>
         case 'dashhome': return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
         case 'dashstations': return <DashStations handlePageChange={handlePageChange} activePage={activePage}/>
         case 'dashitems': return <DashItems handlePageChange={handlePageChange} activePage={activePage} />
         case 'dashmanager': return <DashManager handlePageChange={handlePageChange} activePage={activePage}/>
-        default:
-          if (setupComplete){
-            return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
-          } else {
-            return <Setup handlePageChange={handlePageChange}/>
-          }
-          
+       default:
+            if (!isAuthenticated()) {
+                return <DashLogin handlePageChange={handlePageChange}/>
+            } else if (!setupComplete) {
+                return <Setup handlePageChange={handlePageChange}/>
+            } else {
+                return <DashHome handlePageChange={handlePageChange} activePage={activePage}/>
+            }
       }
     };
   
     return (
-      <AuthProvider>
-          <ErrorProvider>
-              <ErrorDisplay currentPage={activePage} />
-              <Router>
-                  <UrlHandler setActivePage={setActivePage} />
-                  <Routes>
-                      <Route path="/admin" element={<AdminPage />} />
-                  </Routes>
-                  <div className="App">
-                      {renderPage()}
-                  </div>
-              </Router>
-          </ErrorProvider>
-      </AuthProvider>
+        <ErrorProvider>
+            <ErrorDisplay currentPage={activePage} />
+            <Router>
+                <UrlHandler setActivePage={setActivePage} />
+                <div className="App">
+                    {renderPage()}
+                </div>
+            </Router>
+        </ErrorProvider>
     );
   };
 

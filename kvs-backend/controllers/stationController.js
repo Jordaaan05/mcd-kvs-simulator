@@ -1,8 +1,10 @@
 const { Stations } = require('../models/database');
 
 const getAllStations = async (req, res) => {
+    const StoreId = req.user.storeId;
+
     try {
-        const stations = await Stations.findAll()
+        const stations = await Stations.findAll({ where: { StoreId } })
         res.json(stations)
     } catch (err) {
         console.error('Error fetching stations:', err);
@@ -11,9 +13,11 @@ const getAllStations = async (req, res) => {
 }
 
 const getStationByName = async (req, res) => {
-    const { name } = req.params
+    const { name } = req.params;
+    const StoreId = req.user.storeId;
+
     try {
-        const station = await Stations.findOne({ where: { name } })
+        const station = await Stations.findOne({ where: { name, StoreId } })
         if (!station) return res.status(404).json({ error: 'Station not found' });
         res.json(station);
     } catch (err) {
@@ -23,6 +27,7 @@ const getStationByName = async (req, res) => {
 }
 
 const createStation = async (req, res) => {
+    const StoreId = req.user.storeId;
     const { name, group, status, displayName } = req.body;
 
     try {
@@ -30,7 +35,8 @@ const createStation = async (req, res) => {
             name,
             group,
             displayName,
-            status
+            status,
+            StoreId
         });
 
         res.status(201).json(newStation)
@@ -43,9 +49,15 @@ const createStation = async (req, res) => {
 const updateStationStatus = async (req, res) => {
     const { id } = req.params;
     const { name, group, status, displayName,  } = req.body;
+    const StoreId = req.user.storeId;
 
     try {
-        const station = await Stations.findByPk(id);
+        const station = await Stations.findOne({
+            where: {
+                id,
+                StoreId
+            }
+        });
 
         if (!station) {
             return res.status(404).json({ error: 'Station not found' })

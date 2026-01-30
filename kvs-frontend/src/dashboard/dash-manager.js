@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import DashNav from './dash-nav';
 import '../css/dashboard.css'
 
-import axios from 'axios';
+import api from '../modules/api';
 import { jwtDecode } from 'jwt-decode';
 
 function DashManager({ handlePageChange, activePage }) {
@@ -23,7 +23,7 @@ function DashManager({ handlePageChange, activePage }) {
         const decoded = jwtDecode(token);
         const storeId = decoded.storeId
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/${storeId}`)
+            const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/${storeId}`)
             if (response.data) {
                 const currentBusinessDate = response.data.currentBusinessDay
                 setCurrentBusinessDay(currentBusinessDate)
@@ -48,12 +48,12 @@ function DashManager({ handlePageChange, activePage }) {
         const currentDay = new Date(currentBusinessDay)
 
         if (newBusinessDay.getDate() === currentDay.getDate()) {
-          console.log("Business date is already current... Aborting opening new day")
-          return
+            console.log("Business date is already current... Aborting opening new day")
+            return
         }
     
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store/${storeId}`, {
-          businessDate: newBusinessDay
+        await api.post(`/store/${storeId}`, {
+            businessDate: newBusinessDay
         })
     
         console.log(`New day: ${newBusinessDay.getDate()}-${newBusinessDay.getMonth()}-${newBusinessDay.getFullYear()} opened successfully.`)

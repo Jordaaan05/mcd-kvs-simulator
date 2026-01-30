@@ -79,7 +79,7 @@ const modifyOption = async (req, res) => {
             };
         };
 
-        const optionWithCategory = await Option.findByPk(option.id, { include: Category });
+        const optionWithCategory = await Item.findByPk(option.id, { include: Category });
         res.json(optionWithCategory || option);
     } catch (err) {
         console.error("Error updating Option:", err);

@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useMemo, useRef } from "react";
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../modules/api';
 import '../css/BasicKVS.css';
 import toggleStationStatus from './modules/toggleStationStatus';
 import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from './modules/calculateAverageTimes';
@@ -26,7 +26,7 @@ function Display({ stationName: routeId, config: propConfig }) {
     
     const fetchOrders = async () => {
         try {
-            const res = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
+            const res = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
             const filtered = res.data
                 .filter(order => !order.served?.[stationName])
                 .filter(order => order.sendToKVS?.includes(stationName));
@@ -39,7 +39,7 @@ function Display({ stationName: routeId, config: propConfig }) {
 
     const fetchRecentServedOrders = async () => {
         try {
-            const res = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${currentBusinessDay}/station/${stationName}`);
+            const res = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${currentBusinessDay}/station/${stationName}`);
             setServedOrders(res.data || []);
         } catch (err) {
             console.error('Error fetching recent served orders:', err);
@@ -63,12 +63,21 @@ function Display({ stationName: routeId, config: propConfig }) {
 
         try {
             const ws = new WebSocket(`ws://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}`);
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    type: "JOIN",
+                    storeId: sessionStorage.getItem("storeId"),
+                    kvsNum: routeId
+                }))
+            }
+
             ws.onmessage = async (event) => {
                 try {
                     const message = JSON.parse(event.data);
                     if (message.type === 'NEW_ORDER') {
                         if (message.data[1].includes(routeId)) {
-                            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`);
+                            const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`);
                             setOrders(prev => {
                                 const updated = [...prev, response.data];
                                 setPlusOrders(updated.length > (config.columns * 2));
@@ -137,7 +146,7 @@ function Display({ stationName: routeId, config: propConfig }) {
         try {
             const { id } = order;
             const servedTimestamp = new Date();
-            const res = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`);
+            const res = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`);
             const orderToUpdate = res.data;
             const updatedOrder = {
                 ...orderToUpdate,
@@ -146,7 +155,7 @@ function Display({ stationName: routeId, config: propConfig }) {
                     [stationName]: servedTimestamp
                 }
             };
-            await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
+            await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
             await fetchOrders();
             await fetchRecentServedOrders();
             setActiveIndex(0);
@@ -223,20 +232,23 @@ function Display({ stationName: routeId, config: propConfig }) {
                         const renderHeader = cardClass === 'order-card-single' || cardClass === 'order-card-left';
                         const renderFooterText = cardClass === 'order-card-single' || cardClass === 'order-card-left';
 
-                        const filteredItems = config.transformItems
-                            ? config.transformItems(
-                                    order.Items.slice(i, i + itemsPerCard),
-                                    { order, i, itemsPerCard, stationName }
-                                )
-                            : applySortRules(
-                                    order.Items.slice(i, i + itemsPerCard),
-                                    null,
-                                    { order, i, itemsPerCard, stationName }
-                                );
+                        const ctx = { order, i, itemsPerCard, stationName };
+                        const slice = order.Items.slice(i, i + itemsPerCard);
 
+                        const transformed = config.transformItems ? config.transformItems(slice, ctx) : slice;
+                        
+                        const arr = Array.isArray(transformed)
+                            ? transformed.slice()
+                            : (transformed && Array.isArray(transformed.items) ? transformed.items.slice()
+                                : (transformed && Array.isArray(transformed.Items) ? transformed.Items.slice() : []));
 
-                        // active flag
-                        const isActive = orderIndex === activeIndex;
+                        const filteredItems = applySortRules(arr, {
+                            sort: [
+                                { by: 'category.sortID', dir: 'asc' },
+                                { by: 'display', dir: 'asc' }
+                            ],
+                            filter: null
+                        }, ctx);
 
                         cards.push(
                             <div className={`order-card ${cardClass} ${getOrderBorderStyle(orderIndex)}`} key={`${order.id}-${i}`}>

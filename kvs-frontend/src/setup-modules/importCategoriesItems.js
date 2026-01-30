@@ -3,7 +3,7 @@
 */
 import { defaultCategories } from "../default_store/categories"
 import { menuItems } from "../default_store/menuItems"
-import axios from "axios"
+import api from "../modules/api"
 
 import fetchCategories from "../modules/fetch/fetchCategories"
 import fetchItems from "../order-router/fetch-modules/fetchItems"
@@ -43,7 +43,7 @@ const importCategoriesAssignItems = async () => {
 
 const addCategory = async (category) => {
     try {
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
+        await api.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/categories`, {
             name: category.name,
             sortID: category.sortID
         });
@@ -55,7 +55,7 @@ const addCategory = async (category) => {
 
 const addItem = async (item) => {
     try {
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
+        await api.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/options`, {
             name: item.name,
             category: item.category, // Adjust as per your backend schema
             price: item.price, // Adjust as per your backend schema

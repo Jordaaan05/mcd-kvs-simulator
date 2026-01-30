@@ -1,11 +1,11 @@
-import axios from "axios";
+import api from "../../modules/api";
 
 let stations = []
 
 
 const fetchStations = async () => {
     try {
-        const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`)
+        const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations`)
         stations = response.data;
     } catch (error) {
         console.error('Error fetching stations:', error)
@@ -31,12 +31,12 @@ const toggleStationStatus = async (currentStation) => {
     }
     if (currentStation.status === "ON") {
         console.log(`Turning off ${currentStation.displayName}`)
-        await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
+        await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
             status: "OFF"
         })
     } else {
         console.log(`Turning on ${currentStation.displayName}`)
-        await axios.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
+        await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/stations/${currentStation.id}`, {
             status: "ON"
         })
     }

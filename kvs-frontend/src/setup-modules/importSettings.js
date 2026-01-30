@@ -2,7 +2,7 @@
     Import the settings from file into the database
 */
 import { defaultSettings } from "../default_store/defaultSettings"
-import axios from "axios"
+import api from "../modules/api"
 import fetchSettings from "../modules/fetch/fetchSettings"
 
 const importSettings = async () => {
@@ -15,7 +15,7 @@ const importSettings = async () => {
 
         const settingExists = currentSettings.find(setting => setting.name === defaultSetting.name)
         if (!settingExists) {
-            await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`, {
+            await api.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`, {
                 name: defaultSetting.name,
                 value: defaultSetting.value
             })

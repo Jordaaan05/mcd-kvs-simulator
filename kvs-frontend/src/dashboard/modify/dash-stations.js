@@ -6,7 +6,7 @@ import React, { act, useEffect, useState } from 'react';
 import { useAuth } from '../../authContext';
 import DashNav from '../dash-nav';
 import '../../css/dashboard.css'
-import axios from 'axios';
+import api from '../../modules/api';
 
 import fetchStation from '../../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../../modules/fetch/fetchCurrentBusinessDay';
@@ -84,7 +84,7 @@ function DashStations({ handlePageChange, activePage }) {
         }
     
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}`);
+            const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}`);
             const currentDayServedOrders = response.data || [];
             if (currentDayServedOrders.length === 0) {
                 return '0'; // No orders found
@@ -107,7 +107,7 @@ function DashStations({ handlePageChange, activePage }) {
         }
 
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}/new`);
+            const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/day/${businessDayData}/station/${station.name}/new`);
             const currentDayActiveOrders = response.data || []
             console.log("Active orders for station:", station.name, currentDayActiveOrders, currentDayActiveOrders.length)
 

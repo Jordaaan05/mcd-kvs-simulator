@@ -3,7 +3,7 @@
 */
 
 import React, { useState } from 'react'
-import axios from 'axios'
+import api from './modules/api'
 import './css/Setup.css'
 
 import runSetup from './setup-modules/runAllSetup'
@@ -21,15 +21,17 @@ function Setup({ handlePageChange }) {
     const openNewBusinessDay = async () => {
         const newBusinessDay = new Date();
 
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/store`, {
-        businessDate: newBusinessDay
+        const storeId = sessionStorage.getItem("storeId")
+
+        await api.post(`/store/${storeId}`, {
+            businessDate: newBusinessDay
         })
 
         console.log(`New day: ${newBusinessDay.getDate()}-${newBusinessDay.getMonth()}-${newBusinessDay.getFullYear()} opened successfully.`)
     }
 
     const setupComplete = async () => {
-        await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/settings`, {  
+        await api.post("/settings", {  
             name: 'Setup-Complete',
             value: 'true'
         })

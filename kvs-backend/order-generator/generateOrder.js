@@ -46,7 +46,7 @@ const storeCharacteristics = {
     },
 }
 
-const generateOrder = (currentSettings, currentItems, currentBusinessDay, customerLocation) => {
+const generateOrder = (storeId, currentSettings, currentItems, currentBusinessDay, customerLocation, clock) => {
     console.log("Executing Generate Order...")
 
     const time = translateCurrentTime(currentSettings) // Gets the current time in form of { time, time in text (Breakfast, Lunch....) }
@@ -56,7 +56,7 @@ const generateOrder = (currentSettings, currentItems, currentBusinessDay, custom
     if (currentSettings.find(setting => setting.name === "Rush-Period").value !== "Off") {
         timeOfDay = currentSettings.find(setting => setting.name === "Rush-Period").value
     }
-    let order = { items: [], businessDay: currentBusinessDay }
+    let order = { items: [], businessDay: currentBusinessDay, StoreId: storeId }
 
     // first of all assign information about registers, timestamp
     let registerNumber
@@ -83,10 +83,9 @@ const generateOrder = (currentSettings, currentItems, currentBusinessDay, custom
     }
     
 
-    order = { ...order, registerNumber: `R${registerNumber}`, timestamp: new Date() }
+    order = { ...order, registerNumber: `R${registerNumber}`, timestamp: new Date(clock.now()) }
 
     // next if the kitchen lock setting is enabled, only generate orders with breakfast, beef, chicken items
-
 
     // then do rest as normal, if FC lock is selected, normal orders still need to be created, just needs to be routed to FC only.
     let coffeeOnly = false
