@@ -3,7 +3,8 @@ const WebSocket = require('ws')
 
 const simulationRegistry = require("../simulation/simulationRegistry");
 const { Store, Stations } = require("../models/database");
-const { addClientToRoom, removeClientFromRoom } = require("./broadcaster");
+const { addClient, removeClient } = require("./roomRegistry")
+const { broadcastToRestaurant } = require("./broadcaster")
 
 let wss;
 
@@ -27,7 +28,7 @@ const initialiseWebSocket = (server) => {
                         rooms.set(storeId, new Set());
                     }
 
-                    addClientToRoom(storeId, ws)
+                    addClient(storeId, ws)
                     ws.storeId = storeId;
                     ws.kvsNum = kvsNum;
 
@@ -50,7 +51,8 @@ const initialiseWebSocket = (server) => {
                             return;
                         }
 
-                        const businessDayStart = store.currentBusinessDay;
+                        const businessDayStart = new Date();
+                        //const businessDayStart = store.currentBusinessDay;
                         const endTime = store.simulationEndTime ?? null;
 
                         const sim = simulationRegistry.ensureRunning({
@@ -60,6 +62,19 @@ const initialiseWebSocket = (server) => {
                         });
 
                         sim.onClientConnected()
+
+                        const metrics = sim.getStationMetrics(kvsNum);
+                        if (metrics) {
+                            broadcastToRestaurant(storeId, {
+                                type: "STATION_METRICS_UPDATED",
+                                data: {
+                                    stationId: kvsNum,
+                                    servedAt: null,
+                                    durationSeconds: 0,
+                                    averages: metrics.getAverages()
+                                }
+                            });
+                        }
                     } catch (err) {
                         console.error("[SE] Error starting simulation:", err);
                     }
@@ -75,7 +90,7 @@ const initialiseWebSocket = (server) => {
 
         ws.on("close", () => {
             if (ws.storeId) {
-                const isEmpty = removeClientFromRoom(ws.storeId, ws)
+                const isEmpty = removeClient(ws.storeId, ws)
                 if (ws.kvsNum !== "APP" && isEmpty) {
                     const sim = simulationRegistry.get(ws.storeId);
                     sim?.onClientDisconnected();    

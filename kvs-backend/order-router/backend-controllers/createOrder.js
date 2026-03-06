@@ -3,7 +3,7 @@
 */
 
 const { Order, Item } = require("../../models/database")  
-const { broadcastToRestaurant } = require("../../modules/broadcaster")
+const { broadcastToRestaurant } = require("../../ws/broadcaster")
 
 const createOrder = async (order) => {
     const { orderNumber, location, items, status, mfySide, timestamp, FCSide, kvsToSendTo, registerNumber, orderLocation, eatInTakeOut, businessDay, StoreId } = order
@@ -42,7 +42,7 @@ const createOrder = async (order) => {
         });
         await Promise.all(itemPromises)
   
-        broadcastToRestaurant(StoreId, { type: "NEW_ORDER", data: [newOrder.id, kvsToSendTo] });
+        broadcastToRestaurant(StoreId, { type: "ORDER_CREATED", data: [newOrder.id, kvsToSendTo] });
     } catch (err) {
         console.error('Error creating order:', err);
     }

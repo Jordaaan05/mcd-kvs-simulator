@@ -1,4 +1,5 @@
 const { Stations } = require('../models/database');
+const simulationRegistry = require("../simulation/simulationRegistry");
 
 const getAllStations = async (req, res) => {
     const StoreId = req.user.storeId;

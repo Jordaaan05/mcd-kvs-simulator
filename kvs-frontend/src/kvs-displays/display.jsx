@@ -21,6 +21,8 @@ function Display({ stationName: routeId, config: propConfig }) {
     const [recallMode, setRecallMode] = useState(false);
     const [recalledOrder, setRecalledOrder] = useState(0);
     const [recallStateValue, setRecallStateValue] = useState(0);
+    const [lastHourTime, setLastHourTime] = useState(0);
+    const [lastDayTime, setLastDayTime] = useState(0);
     const wsRef = useRef(null);
     const sortConfigVersionRef = useRef(0); // force recompute on station change
     
@@ -75,16 +77,70 @@ function Display({ stationName: routeId, config: propConfig }) {
             ws.onmessage = async (event) => {
                 try {
                     const message = JSON.parse(event.data);
-                    if (message.type === 'NEW_ORDER') {
-                        if (message.data[1].includes(routeId)) {
+                    switch (message.type) {
+
+                        case 'ORDER_CREATED': {
+                            const [orderId, kvsToSendTo] = message.data;
+
+                            if (!kvsToSendTo.includes(routeId)) return;
+
                             const response = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${message.data[0]}`);
+
                             setOrders(prev => {
+                                if (prev.some(o => o.id === orderId)) return prev; // avoiding duplicates
+
                                 const updated = [...prev, response.data];
                                 setPlusOrders(updated.length > (config.columns * 2));
                                 return updated;
                             });
+
+                            break;
                         }
+
+                        case 'ORDER_COMPLETED': {
+                            const [orderId, station] = message.data;
+                            if (station !== routeId) return;
+
+                            let removedOrder = null;
+
+                            setOrders(prev => {
+                                const remaining = [];
+                                for (const order of prev) {
+                                    if (order.id === orderId) {
+                                        removedOrder = order;
+                                    } else {
+                                        remaining.push(order);
+                                    }
+                                }
+
+                                setPlusOrders(remaining.length > (config.columns * 2));
+                                return remaining;
+                            });
+
+                            if (removedOrder) {
+                                setServedOrders(prev => [removedOrder, ...prev]);
+                            }
+
+                            setActiveIndex(0);
+
+                            break;
+                        }
+
+                        case "STATION_METRICS_UPDATED":
+                            const metricData = message.data;
+
+                            if (metricData.stationId !== routeId) return;
+
+                            setLastHourTime(metricData.averages.lastHour);
+                            setLastDayTime(metricData.averages.last24Hours);
+
+                            break;
+
+                        default: 
+                            // ignore unknown messages
+                            break;
                     }
+
                 } catch (err) {
                     console.error('WS message parse/error', err);
                 }
@@ -155,7 +211,7 @@ function Display({ stationName: routeId, config: propConfig }) {
                     [stationName]: servedTimestamp
                 }
             };
-            await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`, updatedOrder);
+            await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}/serve`, { station: routeId, timestamp: servedTimestamp });
             await fetchOrders();
             await fetchRecentServedOrders();
             setActiveIndex(0);
@@ -291,8 +347,8 @@ function Display({ stationName: routeId, config: propConfig }) {
 
                 <div className="station-statistics">
                     <span className='station-stats'>
-                        All / {currentStation?.displayName} <span className={`station-status ${currentStation?.status}`}>{currentStation?.status}</span>
-                        {currentStation && ` ${averageTimestampDifferenceLastHour(servedOrders, stationName, currentBusinessDay)}/${averageTimestampDifferenceLast24Hours(servedOrders, stationName, currentBusinessDay)}`}
+                        All / {currentStation?.displayName} <span className={`station-status ${currentStation?.status}`}>{currentStation?.status} </span>
+                        {lastHourTime} / {lastDayTime}
                     </span>
                 </div>
 

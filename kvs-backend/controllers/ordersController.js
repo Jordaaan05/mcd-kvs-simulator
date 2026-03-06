@@ -1,5 +1,6 @@
-const { Order, Item, Category } = require('../models/database'); // Adjust the path as per your project structure
-const { broadcastToRestaurant } = require('../modules/broadcaster')
+const { Order, Item, Category, Store } = require('../models/database'); // Adjust the path as per your project structure
+const simulationRegistry = require("../simulation/simulationRegistry")
+const { broadcastToRestaurant } = require('../ws/broadcaster')
 const { Op } = require('sequelize')
 
 /*
@@ -219,7 +220,7 @@ const createOrder = async (req, res) => {
         });
         await Promise.all(itemPromises)
 
-        broadcastToRestaurant({ type: "NEW_ORDER", data: [newOrder.id, kvsToSendTo] })
+        broadcastToRestaurant({ type: "ORDER_CREATED", data: [newOrder.id, kvsToSendTo] })
 
         res.status(201).json(newOrder);
     } catch (err) {
@@ -257,6 +258,49 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const serveOrder = async (req, res) => {
+    const { id } = req.params;
+    const { station, timestamp } = req.body;
+    const StoreId = req.user.storeId;
+
+    try { 
+        const order = await Order.findOne({ where: { id, StoreId } });
+        if (!order) return res.status(404).end();
+
+        if (order.served?.[station]) {
+            return res.status(409).json({ error: "This order has already been served" });
+        }
+
+        const servedAt = timestamp;
+
+        order.served = { ...order.served, [station]: servedAt };
+        await order.save();
+
+        const sim = simulationRegistry.get(StoreId);
+        if (sim) {
+            const metricsUpdate = sim.recordServe({
+                stationId: station,
+                orderCreatedAt: order.createdAt
+            });
+
+            broadcastToRestaurant(StoreId.toString(), {
+                type: "STATION_METRICS_UPDATED",
+                data: metricsUpdate
+            });
+        }
+
+        broadcastToRestaurant(StoreId.toString(), {
+            type: "ORDER_COMPLETED",
+            data: [order.id, station]
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to serve order" });
+    }   
+}
+
 // Delete an order
 const deleteOrder = async (req, res) => {
     const { id } = req.params;
@@ -287,6 +331,7 @@ module.exports = {
   getAllOrders,
   createOrder,
   updateOrderStatus,
+  serveOrder,
   deleteOrder,
   getLastDTOrder,
   getLastFCOrder,

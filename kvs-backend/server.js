@@ -11,7 +11,7 @@ const stationsRouter = require('./routes/stations')
 const storeRouter = require('./routes/store')
 const settingsRouter = require('./routes/settings')
 const authRouter = require('./auth/authRoutes')
-const { initialiseWebSocket } = require('./modules/websocket')
+const { initialiseWebSocket } = require('./ws/websocket')
 
 const { simulate15MinInterval } = require('./order-generator/executeOrderGenerator') 
 const { loadSampleData } = require('./order-generator/order-data/generateSampleData') 

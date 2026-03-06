@@ -27,4 +27,7 @@ router.put('/:id', authenticateToken, ordersController.updateOrderStatus);
 // DELETE an order
 router.delete('/:id', authenticateToken, ordersController.deleteOrder);
 
+// serve an order
+router.put(`/:id/serve`, authenticateToken, ordersController.serveOrder);
+
 module.exports = router;

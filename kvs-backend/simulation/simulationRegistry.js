@@ -12,15 +12,16 @@ class SimulationRegistry {
     }
 
     get(storeId) {
-        return this.simulations.get(storeId)
+        return this.simulations.get(String(storeId))
     }
 
     isRunning(storeId) {
-        return this.simulations.has(storeId)
+        return this.simulations.has(String(storeId))
     }
 
     // Starts a new simulation when the first KVS device connects, at the start of the business day. passes through a manual ending time if set.
     ensureRunning({ storeId, businessDayStart, endTime }) {
+        storeId = String(storeId);
         if (this.isRunning(storeId)) return this.get(storeId)
 
         const sim = new RestaurantSimulation({
@@ -35,7 +36,7 @@ class SimulationRegistry {
 
         sim.start()
         this.simulations.set(storeId, sim)
-
+        
         return sim
     }
 

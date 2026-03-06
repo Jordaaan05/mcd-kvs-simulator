@@ -3,3 +3,11 @@
 - Set time/date for program, all times referenced from this on displays/in order generator
 - Order generator adjust volumes / factor in store size, improve sample data.
 - Fry KVS and DT KVS
+- mgr dashboard "team" page - allows users to create additional accounts for their team to access.
+- admin page global user management features (LOCKED DOWN!!!)
+- store / display sales information for the hour
+- Fix orders not serving off on all instances open of a particular KVS monitor (i.e. 2 kitchen screens, only one order will disappear on - WS call on serve?)
+
+
+- Unified log in menu, enforces the user to choose MFY1 or FC1 
+- "AI" workers for other KVS displays (toggleable)

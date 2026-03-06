@@ -6,7 +6,7 @@ const { RestaurantClock } = require('./restaurantClock')
 const { Settings, Category, Item, Store, CustomerCount } = require("../models/database")
 const { generateOrder } = require("../order-generator/generateOrder")
 const { applyVariation } = require("./demandUtils")
-
+const StationMetrics = require('./stationMetrics')
 
 class RestaurantSimulation {
     constructor({ storeId, businessDayStart, endTime, onStop, sampleData }) {
@@ -28,6 +28,7 @@ class RestaurantSimulation {
             startTime: Date.now(),
             speed: 1
         });
+        this.stationMetrics = new Map();
     }
 
     start() {
@@ -205,6 +206,45 @@ class RestaurantSimulation {
             generateOrder(this.storeId, settings, items, store.currentBusinessDay, customerLocation, this.clock);
         } else {
             console.log(`[R#${this.storeId}] Attempted to schedule order ${index}/${count} (${customerLocation}) after ${delay} ms, but generator is disabled. `)
+        };
+    }
+
+    // Station metric calculator
+
+    getStationMetrics(stationId) {
+        if (!this.stationMetrics.has(stationId)) {
+            this.stationMetrics.set(stationId, new StationMetrics());
+        }
+        return this.stationMetrics.get(stationId);
+    } 
+
+    getAllStationMetrics() {
+        const result = {};
+
+        for (const [stationId, metrics] of this.stationMetrics.entries()) {
+            result[stationId] = metrics.getAverages();
+        }
+
+        return result;
+    }
+
+    // Record an order serve
+
+    recordServe({ stationId, orderCreatedAt }) {
+        const servedAt = this.clock.now();
+        const durationSeconds = Math.floor(
+            (servedAt - new Date(orderCreatedAt)) / 1000
+        );
+
+        const metrics = this.getStationMetrics(stationId);
+
+        metrics.recordServe(servedAt, durationSeconds)
+
+        return {
+            stationId,
+            servedAt,
+            durationSeconds,
+            averages: metrics.getAverages()
         };
     }
 }
