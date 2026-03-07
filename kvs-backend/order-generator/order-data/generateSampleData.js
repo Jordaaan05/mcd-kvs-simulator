@@ -5,45 +5,76 @@ const SAMPLE_DATA_PATH = path.join(__dirname, 'sampleData.json')
 
 const generateSampleData = () => {
     const data = {}
+
     const baseFront = 20;
     const baseDrive = 25;
-    const rushHours = [9,10,12,13,17,18,19]
-    const slowerHours = [2,3,4,5]
+
+    const fcHourCurve = [
+        0.2,0.2,0.2,0.2,0.3,0.5,0.7,1.0,
+        1.4,1.6,1.8,2.0,2.1,2.0,1.6,1.4,
+        1.3,1.5,1.7,1.6,1.3,1.0,0.6,0.3
+    ]
+
+    const dtHourCurve = [
+        0.3,0.3,0.3,0.3,0.4,0.7,1.0,1.3,
+        1.5,1.6,1.7,1.8,1.8,1.7,1.5,1.4,
+        1.5,1.7,1.9,2.0,1.7,1.4,1.0,0.7
+    ]
+
+    const weekdayCurve = [
+        1.3, // Sunday
+        0.85,
+        0.95,
+        1.0,
+        1.05,
+        1.1,
+        1.35 // Saturday
+    ]
+
+    const fridayNightBoost = [
+        1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,
+        1.1,1.35,1.4,1.3,1.2,1.15,1.1,1
+    ]
+
+    const sundayNightDrop = [
+        1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,
+        0.95,0.9,0.8,0.7,0.6,0.6,0.6,0.6
+    ]
+
 
     for (let month = 0; month < 12; month++) {
         for (let day = 0; day < 7; day++) {
             for (let hour = 0; hour < 24; hour++) {
-                let front = baseFront; 
+
+                let front = baseFront;
                 let drive = baseDrive
 
-                if (rushHours.includes(hour)) {
-                    front *= 2.0
-                    drive *= 1.8
-                } else if (slowerHours.includes(hour)) {
-                    front *= 0.4;
-                    drive *= 0.5
-                } else {
-                    front *= 1.0
-                    drive *= 1.1;
+                front *= fcHourCurve[hour];
+                drive *= dtHourCurve[hour];
+
+                front *= weekdayCurve[day];
+                drive *= weekdayCurve[day];
+
+                if (day === 5) {
+                    front *= fridayNightBoost[hour];
+                    drive *= fridayNightBoost[hour];
                 }
 
-                if (day === 0 || day === 6) { // Sunday or Saturday
-                    front *= 1.2;
-                    drive *= 1.3;
-                } else if (day === 1) { // Monday
-                    front *= 0.9;
-                    drive *= 0.95;
+                if (day === 0) {
+                    front *= sundayNightDrop[hour];
+                    drive *= sundayNightDrop[hour];
                 }
-                  
-                if (month === 2 || month === 3) { // Feburary / March
-                    front *= 0.85
-                    drive *= 0.95
-                } else if (month === 11 || (month >= 0 && month <= 1)) {
-                    front *= 1.25
-                    drive *= 1.2
-                }
+
+                const season =
+                    1 + 0.2 * Math.sin((month / 12) * Math.PI * 2)
+
+                front *= season
+                drive *= season
 
                 const key = `${month}-${day}-${hour}`
+
                 data[key] = {
                     FC: Math.round(front),
                     DT: Math.round(drive)
@@ -55,10 +86,11 @@ const generateSampleData = () => {
     return data
 }
 
-const saveSampleDataToFile = (data) => {
+const saveSampleDataToFile = () => {
+    const data = generateSampleData()
     const wrapped = {
         generatedAt: new Date().toISOString(),
-        data,
+        data
     }
 
     fs.writeFileSync(SAMPLE_DATA_PATH, JSON.stringify(wrapped, null, 2), 'utf-8')

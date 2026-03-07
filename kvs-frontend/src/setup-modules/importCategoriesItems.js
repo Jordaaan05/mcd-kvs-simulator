@@ -15,7 +15,6 @@ const importCategoriesAssignItems = async () => {
     for (let defaultCategory of defaultCategories) {
         if (categories.find(category => category.name === defaultCategory.name)) {
           console.log("Already Exists")
-          continue;
         } else {
           await addCategory(defaultCategory)
           categories = await fetchCategories()
@@ -38,7 +37,6 @@ const importCategoriesAssignItems = async () => {
           items = await fetchItems()
         }
     }
-    return
 }
 
 const addCategory = async (category) => {

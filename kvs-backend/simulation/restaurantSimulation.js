@@ -3,10 +3,12 @@
  */
 
 const { RestaurantClock } = require('./restaurantClock')
+// TODO: Store customer counts under CustomerCount table
 const { Settings, Category, Item, Store, CustomerCount } = require("../models/database")
 const { generateOrder } = require("../order-generator/generateOrder")
 const { applyVariation } = require("./demandUtils")
 const StationMetrics = require('./stationMetrics')
+const { WeatherGenerator } = require('./weatherGenerator')
 
 class RestaurantSimulation {
     constructor({ storeId, businessDayStart, endTime, onStop, sampleData }) {
@@ -28,7 +30,9 @@ class RestaurantSimulation {
             startTime: Date.now(),
             speed: 1
         });
+        this.weatherGenerator = new WeatherGenerator()
         this.stationMetrics = new Map();
+        this.weatherEffect = null;
     }
 
     start() {
@@ -40,6 +44,10 @@ class RestaurantSimulation {
         this.startInactivityWatcher()
         this.startBusinessDayWatcher()
         this.startQuarterScheduler()
+
+        const month = new Date(this.clock.now()).getMonth();
+        this.weatherEffect = this.weatherGenerator.generateWeather(month);
+        console.log(`[R#${this.storeId}] Today's weather: ${this.weatherEffect.label}`)
     }
 
     stop(reason = "unknown") {
@@ -158,17 +166,30 @@ class RestaurantSimulation {
 
         const getCustomerCount = (type) => {
             const base = this.sampleData?.data?.[key]?.[type] ?? 0;
-            return applyVariation(base);
+            let count = applyVariation(base);
+            if (this.weatherEffect && this.weatherEffect[type]) {
+                count *= this.weatherEffect[type];
+            }
+            const burst = this.generateBurst(base);
+            count += burst;
+            return Math.max(Math.round(count), 0);
         }
 
         const frontCounterCount = getCustomerCount("FC");
         const driveThruCount = getCustomerCount("DT");
 
         console.log(
-            `[R#${this.storeId}] Interval ${intervalStart.toLocaleTimeString()}\n  FC: ${frontCounterCount}\n  DT: ${driveThruCount}`
+            `[R#${this.storeId}] Interval ${intervalStart.toLocaleTimeString()}\n  FC: ${frontCounterCount}\n  DT: ${driveThruCount} \n  Weather: ${this.weatherEffect?.label || "Normal"}`
         );
 
         this.scheduleOrders(frontCounterCount, "FC")
+    }
+
+    generateBurst(base) {
+        const burstChance = 0.05;
+        if (Math.random() > burstChance) return 0;
+
+        return Math.ceil(base * (0.1 + Math.random() * 0.3))
     }
 
     scheduleOrders(count, type) {
@@ -184,7 +205,7 @@ class RestaurantSimulation {
             }, delay)
 
             this.orderTimeouts.push(timeout);
-        };
+        }
     }
 
     cleanOrderTimeouts() {
@@ -206,7 +227,7 @@ class RestaurantSimulation {
             generateOrder(this.storeId, settings, items, store.currentBusinessDay, customerLocation, this.clock);
         } else {
             console.log(`[R#${this.storeId}] Attempted to schedule order ${index}/${count} (${customerLocation}) after ${delay} ms, but generator is disabled. `)
-        };
+        }
     }
 
     // Station metric calculator
@@ -229,7 +250,6 @@ class RestaurantSimulation {
     }
 
     // Record an order serve
-
     recordServe({ stationId, orderCreatedAt }) {
         const servedAt = this.clock.now();
         const durationSeconds = Math.floor(
