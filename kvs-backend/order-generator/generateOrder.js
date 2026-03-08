@@ -8,7 +8,6 @@
 
 // Module imports
 const { translateCurrentTime } = require("./translateCurrentTime")
-const { calculateBaseRate } = require('./calculateBaseRate')
 const routeOrder = require('../order-router/orderRouter')
 const numItemsPerOrder = require('./numItemsPerOrder')
 const weightedSelectByCategory = require('./weightedSelect')
@@ -23,12 +22,12 @@ const storeCharacteristics = {
     typicalPeriods: [7,8,15,16,20,21,22], // anything not apart of either this or the rush period, is a quiet period.
     transitionalPeriods: [11,14,19], // periods just after a rush period where its busier than typical but winding down.
     coffeeOnlyChance: {
-        "weekday": 0.25,
-        "weekend": 0.025
+        "weekday": 0.1,
+        "weekend": 0.03
     },
     drinkOnlyChance: {
         "weekday": 0.1,
-        "weekend": 0.04
+        "weekend": 0.07
     },
     avgOrderSize: {
         Breakfast: 2,
@@ -49,8 +48,7 @@ const storeCharacteristics = {
 const generateOrder = (storeId, currentSettings, currentItems, currentBusinessDay, customerLocation, clock) => {
     console.log("Executing Generate Order...")
 
-    const time = translateCurrentTime(currentSettings) // Gets the current time in form of { time, time in text (Breakfast, Lunch....) }
-    const currentHour = time.time // current hour in 24 hr time, e.g. 22 for 10 pm
+    const time = translateCurrentTime(currentSettings, clock) // Gets the current time in form of { time, time in text (Breakfast, Lunch....) }
     const currentDay = time.weekday // day of the week starting at 1, monday, up to 7, sunday
     let timeOfDay = time.textTime // current hour converted to the daypart, breakfast, lunch, dinner, etc.
     if (currentSettings.find(setting => setting.name === "Rush-Period").value !== "Off") {
@@ -88,8 +86,8 @@ const generateOrder = (storeId, currentSettings, currentItems, currentBusinessDa
     // next if the kitchen lock setting is enabled, only generate orders with breakfast, beef, chicken items
 
     // then do rest as normal, if FC lock is selected, normal orders still need to be created, just needs to be routed to FC only.
-    let coffeeOnly = false
-    let drinkOnly = false
+    let coffeeOnly;
+    let drinkOnly;
     if (timeOfDay === "Breakfast") {
         if (currentDay >= 1 && currentDay <= 5) {
             coffeeOnly = Math.random() < storeCharacteristics["coffeeOnlyChance"]["weekday"] // chance for an order to just be a coffee and nothing else (10%)
@@ -207,6 +205,8 @@ const generateOrder = (storeId, currentSettings, currentItems, currentBusinessDa
                     order = {...order, items: [...order.items, { id: sides.id, name: sides.name, amount: 1}]}
                 }
                 
+            } else {
+                console.log(`DEBUG: LINE 210 BREAKFAST MENU, NON COMBO}`)
             }
         }
     }

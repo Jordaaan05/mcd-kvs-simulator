@@ -2,10 +2,10 @@
     Gathers the system time and translates it into either "Breakfast", "Lunch", "Dinner", "Overnight"
 */
 
-const translateCurrentTime = (currentSettings) => {
-    const now = new Date()
+const translateCurrentTime = (currentSettings, clock) => {
+    const now = new Date(clock.now())
     const currentHour = now.getHours()
-    let time = {}
+    let time;
 
     if (currentHour < 5 || currentHour >= 23) {
         time = { time: currentHour, textTime: "Overnight" }

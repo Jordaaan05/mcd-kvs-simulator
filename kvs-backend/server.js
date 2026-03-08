@@ -13,9 +13,6 @@ const settingsRouter = require('./routes/settings')
 const authRouter = require('./auth/authRoutes')
 const { initialiseWebSocket } = require('./ws/websocket')
 
-const { simulate15MinInterval } = require('./order-generator/executeOrderGenerator') 
-const { loadSampleData } = require('./order-generator/order-data/generateSampleData') 
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());

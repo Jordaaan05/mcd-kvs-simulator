@@ -12,7 +12,7 @@
 .orders-container {
   display: grid;
   grid-template-rows: repeat(2, 1fr);
-  gap: 0px;
+  gap: 0;
   justify-items: center;
   padding: 0 10px;
   height: 90vh;
@@ -39,7 +39,7 @@
 
 .order-card {
   border: 5px solid #ccc;
-  border-radius: 0px;
+  border-radius: 0;
   margin: 0.5em 0;
   width: calc(100% / 1.02); /* Adjust for the margins and padding */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -51,7 +51,7 @@
 
 .order-card-recall-2 {
   border: 5px solid #ccc;
-  border-radius: 0px;
+  border-radius: 0;
   margin: 0.5em 0;
   width: calc(100% / 1.02); /* Adjust for the margins and padding */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -65,7 +65,7 @@
 
 .order-card-recall-4 {
   border: 5px solid #ccc;
-  border-radius: 0px;
+  border-radius: 0;
   margin: 0.5em 0;
   width: calc(100% / 1.02); /* Adjust for the margins and padding */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -81,14 +81,14 @@
   width: 97.5%;
   margin-left: auto;
   margin-right: 0;
-  border-width: 5px 0px 5px 5px;
+  border-width: 5px 0 5px 5px;
   border-style: solid;
   border-color: #ccc;
 }
 
 .order-card-centre {
   width: 100%;
-  border-width: 5px 0px 5px 0px;
+  border-width: 5px 0 5px 0;
   border-style: solid;
   border-color: #ccc;
 }
@@ -97,7 +97,7 @@
   width: 97.5%;
   margin-left: 0;
   margin-right: auto;
-  border-width: 5px 5px 5px 0px;
+  border-width: 5px 5px 5px 0;
   border-style: solid;
   border-color: #ccc;
 }
@@ -107,19 +107,19 @@
 }
 
 .order-card-left.active-card {
-  border-width: 5px 0px 5px 5px;
+  border-width: 5px 0 5px 5px;
   border-style: solid;
   border-color: orange;
 }
 
 .order-card-centre.active-card {
-  border-width: 5px 0px 5px 0px;
+  border-width: 5px 0 5px 0;
   border-style: solid;
   border-color: orange;
 }
 
 .order-card-right.active-card {
-  border-width: 5px 5px 5px 0px;
+  border-width: 5px 5px 5px 0;
   border-style: solid;
   border-color: orange;
 }
@@ -140,7 +140,7 @@
   background-color: #f8f8f8;
   padding: 5px;
   border-bottom: 1px solid #ccc;
-  min-height: 39px;
+  min-height: 45px;
 }
 
 .order-header-contents {
@@ -214,7 +214,7 @@
   padding: 10px;
   border-top: 1px solid #ccc;
   background-color: #f0f0f0;
-  min-height: 18px;
+  min-height: 24px;
 }
 
 .order-footer-text {
@@ -313,7 +313,7 @@
   background-color: gray;
   font-weight: 600;
   font-size: large;
-  left: 0%;
+  left: 0;
 }
 
 .current-time {

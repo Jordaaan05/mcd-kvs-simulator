@@ -1,9 +1,7 @@
-import React, {useEffect, useState, useMemo, useRef } from "react";
-import { useParams } from 'react-router-dom';
+import React, {useEffect, useState, useRef } from "react";
 import api from '../modules/api';
 import '../css/BasicKVS.css';
 import toggleStationStatus from './modules/toggleStationStatus';
-import { averageTimestampDifferenceLast24Hours, averageTimestampDifferenceLastHour } from './modules/calculateAverageTimes';
 import fetchStation from '../modules/fetch/fetchStations';
 import fetchCurrentBusinessDay from '../modules/fetch/fetchCurrentBusinessDay';
 import get24HrTime from './modules/get24hTime';
@@ -23,9 +21,10 @@ function Display({ stationName: routeId, config: propConfig }) {
     const [recallStateValue, setRecallStateValue] = useState(0);
     const [lastHourTime, setLastHourTime] = useState(0);
     const [lastDayTime, setLastDayTime] = useState(0);
+    const [multiCardOrders, setMultiCardOrders] = useState(0);
     const wsRef = useRef(null);
     const sortConfigVersionRef = useRef(0); // force recompute on station change
-    
+
     const fetchOrders = async () => {
         try {
             const res = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders`);
@@ -33,6 +32,7 @@ function Display({ stationName: routeId, config: propConfig }) {
                 .filter(order => !order.served?.[stationName])
                 .filter(order => order.sendToKVS?.includes(stationName));
             setPlusOrders(filtered.length > (columns * 2));
+            numVisibleMultiCardOrders(filtered);
             setOrders(filtered);
         } catch (err) {
             console.error('Error fetching orders:', err);
@@ -90,6 +90,7 @@ function Display({ stationName: routeId, config: propConfig }) {
                                 if (prev.some(o => o.id === orderId)) return prev; // avoiding duplicates
 
                                 const updated = [...prev, response.data];
+                                numVisibleMultiCardOrders(updated);
                                 setPlusOrders(updated.length > (config.columns * 2));
                                 return updated;
                             });
@@ -113,6 +114,7 @@ function Display({ stationName: routeId, config: propConfig }) {
                                     }
                                 }
 
+                                numVisibleMultiCardOrders(remaining);
                                 setPlusOrders(remaining.length > (config.columns * 2));
                                 return remaining;
                             });
@@ -186,6 +188,15 @@ function Display({ stationName: routeId, config: propConfig }) {
         footerRedTime = config.redTime ?? 60,
     } = config;
 
+    const numVisibleMultiCardOrders = (activeOrders) => {
+        let count = 0;
+        for (const order of activeOrders) {
+            let numCards = Math.ceil(order.Items.length / itemsPerCard);
+            if (numCards >= 2) count+=(numCards-1);
+        }
+        setMultiCardOrders(Math.min(count, 7));
+    }
+
     const recallLastOrder = () => {
         if (recallMode) {
             setRecallMode(false);
@@ -202,15 +213,6 @@ function Display({ stationName: routeId, config: propConfig }) {
         try {
             const { id } = order;
             const servedTimestamp = new Date();
-            const res = await api.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}`);
-            const orderToUpdate = res.data;
-            const updatedOrder = {
-                ...orderToUpdate,
-                served: {
-                    ...orderToUpdate.served,
-                    [stationName]: servedTimestamp
-                }
-            };
             await api.put(`http://${process.env.REACT_APP_SERVER_ADDRESS}:${process.env.REACT_APP_SERVER_PORT}/orders/${id}/serve`, { station: routeId, timestamp: servedTimestamp });
             await fetchOrders();
             await fetchRecentServedOrders();
@@ -227,7 +229,7 @@ function Display({ stationName: routeId, config: propConfig }) {
             return;
         }
         setActiveIndex(prev => {
-            const displayLimit = highlightLimit;
+            const displayLimit = highlightLimit - multiCardOrders;
             const maxIndex = Math.min(displayLimit, orders.length - 1);
             return prev > 0 ? prev - 1 : maxIndex;
         });
@@ -239,7 +241,7 @@ function Display({ stationName: routeId, config: propConfig }) {
             return;
         }
         setActiveIndex(prev => {
-            const displayLimit = highlightLimit;
+            const displayLimit = highlightLimit - multiCardOrders;
             const maxIndex = Math.min(displayLimit, orders.length - 1);
             return prev < maxIndex ? prev + 1 : 0;
         });
@@ -274,7 +276,7 @@ function Display({ stationName: routeId, config: propConfig }) {
     return (
         <div className="App kvs-background">
             <div className={`orders-container columns-${columns}`}>
-                {orders.slice(0, (columns * 2 - recallStateValue)).flatMap((order, orderIndex) => {
+                {orders.slice(0, (columns * 2 - recallStateValue - multiCardOrders)).flatMap((order, orderIndex) => {
                     const cards = [];
                     const numCards = Math.ceil(order.Items.length / itemsPerCard);
 

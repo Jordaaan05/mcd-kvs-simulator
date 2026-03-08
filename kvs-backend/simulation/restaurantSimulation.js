@@ -9,6 +9,7 @@ const { generateOrder } = require("../order-generator/generateOrder")
 const { applyVariation } = require("./demandUtils")
 const StationMetrics = require('./stationMetrics')
 const { WeatherGenerator } = require('./weatherGenerator')
+const {broadcastToRestaurant} = require("../ws/broadcaster");
 
 class RestaurantSimulation {
     constructor({ storeId, businessDayStart, endTime, onStop, sampleData }) {
@@ -110,7 +111,14 @@ class RestaurantSimulation {
         this.intervals.push(interval)
     }
 
-    startBusinessDayWatcher() {
+    async startBusinessDayWatcher() {
+        try {
+            await Store.update({ currentBusinessDay: new Date(this.businessDayStart).toISOString() }, {where: {id: this.storeId}})
+            broadcastToRestaurant({type: "STORE_INFO_UPDATED", data: this.businessDayStart})
+        } catch (err) {
+            console.error('Error updating business day:', err);
+        }
+
         const interval = setInterval(() => {
             const simAge = this.clock.now() - this.businessDayStart;
             const MAX_AGE = 24 * 60 * 60 * 1000;
@@ -166,7 +174,8 @@ class RestaurantSimulation {
 
         const getCustomerCount = (type) => {
             const base = this.sampleData?.data?.[key]?.[type] ?? 0;
-            let count = applyVariation(base);
+            const lambda = base / 4;
+            let count = applyVariation(poisson(lambda));
             if (this.weatherEffect && this.weatherEffect[type]) {
                 count *= this.weatherEffect[type];
             }
@@ -267,6 +276,19 @@ class RestaurantSimulation {
             averages: metrics.getAverages()
         };
     }
+}
+
+const poisson = (lambda) => {
+    const L = Math.exp(-lambda);
+    let k = 0;
+    let p = 1;
+
+    do {
+        k++;
+        p *= Math.random();
+    } while (p > L);
+
+    return k - 1;
 }
 
 module.exports = { RestaurantSimulation }
